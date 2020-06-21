@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 @Entity
 public class CreditCardAcc extends Account{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Integer id;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "creditLimit_amount")),
@@ -38,13 +38,13 @@ public class CreditCardAcc extends Account{
         setInterestRate(interestRate);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
 
     public Money getCreditLimit() {
         return creditLimit;

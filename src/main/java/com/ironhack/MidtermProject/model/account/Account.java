@@ -1,21 +1,35 @@
 package com.ironhack.MidtermProject.model.account;
 
 import com.ironhack.MidtermProject.model.classes.Money;
+import com.ironhack.MidtermProject.model.user.AccountHolder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Integer id;
     private String primaryOwner;
     private String secondaryOwner;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "balance_amount")),
-            @AttributeOverride(name="currency",column = @Column(name = "balance_currency")),
+            @AttributeOverride(name = "currency",column = @Column(name = "balance_currency")),
     })
     private Money balance;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "penaltyFee_amount")),
+            @AttributeOverride(name = "currency",column = @Column(name = "penaltyFee_currency")),
+    })
     private Money penaltyFee;
+
+    @ManyToOne
+    @JoinColumn(name = "account_holder_id")
+    private AccountHolder accountHolder;
 
 
     public Account(){}
@@ -25,6 +39,14 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;
         this.penaltyFee = new Money(new BigDecimal("40"));
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getPrimaryOwner() {
@@ -57,5 +79,13 @@ public abstract class Account {
 
     public void setBalance(Money balance) {
         this.balance = balance;
+    }
+
+    public AccountHolder getAccountHolder() {
+        return accountHolder;
+    }
+
+    public void setAccountHolder(AccountHolder accountHolder) {
+        this.accountHolder = accountHolder;
     }
 }

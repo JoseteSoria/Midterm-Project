@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 
 @Entity
 public class SavingsAcc extends Account{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Integer id;
     private String secretKey;
     @Embedded
     @AttributeOverrides({
@@ -44,13 +44,13 @@ public class SavingsAcc extends Account{
         this.status = status;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
 
     public String getSecretKey() {
         return secretKey;

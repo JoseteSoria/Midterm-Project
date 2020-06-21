@@ -15,17 +15,34 @@ public class CheckingAcc extends Account{
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "minBalance_amount")),
-            @AttributeOverride(name="currency",column = @Column(name = "minBalance_currency")),
+            @AttributeOverride(name = "currency",column = @Column(name = "minBalance_currency")),
     })
     private Money minimumBalance;
-    private BigDecimal monthlyMaintenanceFee;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "monthFee_amount")),
+            @AttributeOverride(name = "currency",column = @Column(name = "monthFee_currency")),
+    })
+    private Money monthlyMaintenanceFee;
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public CheckingAcc() {}
+    public CheckingAcc() {
+        this.minimumBalance = new Money(new BigDecimal("250"));
+        this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
+    }
+    /**Constructor without monthlyMaintenanceFee nor minimumBalance**/
+    public CheckingAcc(String primaryOwner, String secondaryOwner, Money balance, String secretKey, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = secretKey;
+        this.minimumBalance = new Money(new BigDecimal("250"));
+        this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
+        this.status = status;
+    }
 
-    public CheckingAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, String secretKey, Money minimumBalance, BigDecimal monthlyMaintenanceFee, Status status) {
-        super(primaryOwner, secondaryOwner, balance, penaltyFee);
+    /**Constructor with everything**/
+    public CheckingAcc(String primaryOwner, String secondaryOwner, Money balance, String secretKey, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         this.minimumBalance = minimumBalance;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
@@ -56,11 +73,11 @@ public class CheckingAcc extends Account{
         this.minimumBalance = minimumBalance;
     }
 
-    public BigDecimal getMonthlyMaintenanceFee() {
+    public Money getMonthlyMaintenanceFee() {
         return monthlyMaintenanceFee;
     }
 
-    public void setMonthlyMaintenanceFee(BigDecimal monthlyMaintenanceFee) {
+    public void setMonthlyMaintenanceFee(Money monthlyMaintenanceFee) {
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
     }
 

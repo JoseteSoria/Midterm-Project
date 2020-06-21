@@ -17,8 +17,8 @@ public class StudentCheckingAcc extends Account{
 
     public StudentCheckingAcc() {}
 
-    public StudentCheckingAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, String secretKey, Status status) {
-        super(primaryOwner, secondaryOwner, balance, penaltyFee);
+    public StudentCheckingAcc(String primaryOwner, String secondaryOwner, Money balance, String secretKey, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         this.status = status;
     }

@@ -15,20 +15,32 @@ public class SavingsAcc extends Account{
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "minBalance_amount")),
-            @AttributeOverride(name="currency",column = @Column(name = "minBalance_currency")),
+            @AttributeOverride(name = "currency",column = @Column(name = "minBalance_currency")),
     })
     private Money minimumBalance;
     private BigDecimal interestRate;
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public SavingsAcc() {}
+    public SavingsAcc() {
+        this.interestRate = new BigDecimal("0.0025");
+        this.minimumBalance = new Money(new BigDecimal("1000"));
+    }
 
-    public SavingsAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, String secretKey, Money minimumBalance, BigDecimal interestRate, Status status) {
-        super(primaryOwner, secondaryOwner, balance, penaltyFee);
+    /**Constructor without interestRate nor minimumBalance**/
+    public SavingsAcc(String primaryOwner, String secondaryOwner, Money balance, String secretKey, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
-        this.minimumBalance = minimumBalance;
-        this.interestRate = interestRate;
+        this.minimumBalance = new Money(new BigDecimal("1000"));
+        this.interestRate = new BigDecimal("0.0025");
+        this.status = status;
+    }
+    /**Constructor with everything**/
+    public SavingsAcc(String primaryOwner, String secondaryOwner, Money balance, String secretKey, Money minimumBalance, BigDecimal interestRate, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = secretKey;
+        setMinimumBalance(minimumBalance);
+        setInterestRate(interestRate);
         this.status = status;
     }
 
@@ -53,7 +65,13 @@ public class SavingsAcc extends Account{
     }
 
     public void setMinimumBalance(Money minimumBalance) {
-        this.minimumBalance = minimumBalance;
+        if(minimumBalance.getAmount().compareTo(new BigDecimal("1000"))>=0) {
+            this.minimumBalance = new Money(new BigDecimal("1000"));
+        }else if(minimumBalance.getAmount().compareTo(new BigDecimal("100"))<=0) {
+            this.minimumBalance = new Money(new BigDecimal("100"));
+        }else {
+            this.minimumBalance = minimumBalance;
+        }
     }
 
     public Status getStatus() {
@@ -69,6 +87,11 @@ public class SavingsAcc extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
+        if(interestRate.compareTo(new BigDecimal("0,5")) >= 0){
+            this.interestRate = new BigDecimal("0.5");
+        }
+        else{
+            this.interestRate = interestRate;
+        }
     }
 }

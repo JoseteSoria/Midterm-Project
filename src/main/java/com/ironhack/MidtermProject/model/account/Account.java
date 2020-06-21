@@ -15,16 +15,16 @@ public abstract class Account {
             @AttributeOverride(name="currency",column = @Column(name = "balance_currency")),
     })
     private Money balance;
-    private BigDecimal penaltyFee;
+    private Money penaltyFee;
 
 
     public Account(){}
 
-    public Account(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee) {
+    public Account(String primaryOwner, String secondaryOwner, Money balance) {
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;
-        this.penaltyFee = penaltyFee;
+        this.penaltyFee = new Money(new BigDecimal("40"));
     }
 
     public String getPrimaryOwner() {
@@ -43,11 +43,11 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
     }
 
-    public BigDecimal getPenaltyFee() {
+    public Money getPenaltyFee() {
         return penaltyFee;
     }
 
-    public void setPenaltyFee(BigDecimal penaltyFee) {
+    public void setPenaltyFee(Money penaltyFee) {
         this.penaltyFee = penaltyFee;
     }
 

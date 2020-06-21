@@ -1,28 +1,25 @@
-package com.ironhack.MidtermProject.model;
+package com.ironhack.MidtermProject.model.account;
 
 import com.ironhack.MidtermProject.enums.Status;
+import com.ironhack.MidtermProject.model.classes.Money;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-public class SavingsAcc extends Account{
+public class StudentCheckingAcc extends Account{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String secretKey;
-    private BigDecimal minimumBalance;
-    private BigDecimal interestRate;
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public SavingsAcc() {}
+    public StudentCheckingAcc() {}
 
-    public SavingsAcc(String primaryOwner, String secondaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minimumBalance, BigDecimal interestRate, Status status) {
+    public StudentCheckingAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, String secretKey, Status status) {
         super(primaryOwner, secondaryOwner, balance, penaltyFee);
         this.secretKey = secretKey;
-        this.minimumBalance = minimumBalance;
-        this.interestRate = interestRate;
         this.status = status;
     }
 
@@ -42,27 +39,11 @@ public class SavingsAcc extends Account{
         this.secretKey = secretKey;
     }
 
-    public BigDecimal getMinimumBalance() {
-        return minimumBalance;
-    }
-
-    public void setMinimumBalance(BigDecimal minimumBalance) {
-        this.minimumBalance = minimumBalance;
-    }
-
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public BigDecimal getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
     }
 }

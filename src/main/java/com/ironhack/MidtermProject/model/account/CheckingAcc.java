@@ -1,6 +1,7 @@
-package com.ironhack.MidtermProject.model;
+package com.ironhack.MidtermProject.model.account;
 
 import com.ironhack.MidtermProject.enums.Status;
+import com.ironhack.MidtermProject.model.classes.Money;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -11,14 +12,19 @@ public class CheckingAcc extends Account{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String secretKey;
-    private BigDecimal minimumBalance;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "minBalance_amount")),
+            @AttributeOverride(name="currency",column = @Column(name = "minBalance_currency")),
+    })
+    private Money minimumBalance;
     private BigDecimal monthlyMaintenanceFee;
     @Enumerated(EnumType.STRING)
     private Status status;
 
     public CheckingAcc() {}
 
-    public CheckingAcc(String primaryOwner, String secondaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minimumBalance, BigDecimal monthlyMaintenanceFee, Status status) {
+    public CheckingAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, String secretKey, Money minimumBalance, BigDecimal monthlyMaintenanceFee, Status status) {
         super(primaryOwner, secondaryOwner, balance, penaltyFee);
         this.secretKey = secretKey;
         this.minimumBalance = minimumBalance;
@@ -42,11 +48,11 @@ public class CheckingAcc extends Account{
         this.secretKey = secretKey;
     }
 
-    public BigDecimal getMinimumBalance() {
+    public Money getMinimumBalance() {
         return minimumBalance;
     }
 
-    public void setMinimumBalance(BigDecimal minimumBalance) {
+    public void setMinimumBalance(Money minimumBalance) {
         this.minimumBalance = minimumBalance;
     }
 

@@ -1,9 +1,8 @@
-package com.ironhack.MidtermProject.model;
+package com.ironhack.MidtermProject.model.account;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.ironhack.MidtermProject.model.classes.Money;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -12,12 +11,17 @@ public class CreditCardAcc extends Account{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private BigDecimal creditLimit;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "creditLimit_amount")),
+            @AttributeOverride(name="currency",column = @Column(name = "creditLimit_currency")),
+    })
+    private Money creditLimit;
     private BigDecimal interestRate;
 
     public CreditCardAcc() {}
 
-    public CreditCardAcc(String primaryOwner, String secondaryOwner, BigDecimal balance, BigDecimal penaltyFee, BigDecimal creditLimit, BigDecimal interestRate) {
+    public CreditCardAcc(String primaryOwner, String secondaryOwner, Money balance, BigDecimal penaltyFee, Money creditLimit, BigDecimal interestRate) {
         super(primaryOwner, secondaryOwner, balance, penaltyFee);
         this.creditLimit = creditLimit;
         this.interestRate = interestRate;
@@ -31,11 +35,11 @@ public class CreditCardAcc extends Account{
         this.id = id;
     }
 
-    public BigDecimal getCreditLimit() {
+    public Money getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(BigDecimal creditLimit) {
+    public void setCreditLimit(Money creditLimit) {
         this.creditLimit = creditLimit;
     }
 

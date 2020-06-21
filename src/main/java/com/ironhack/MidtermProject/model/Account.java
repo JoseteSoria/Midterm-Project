@@ -8,41 +8,42 @@ import java.math.BigDecimal;
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Account {
-    private String PrimaryOwner;
-    private String SecondaryOwner;
-    private Double penaltyFee;
+    private String primaryOwner;
+    private String secondaryOwner;
     private BigDecimal balance;
+    private BigDecimal penaltyFee;
+
 
     public Account(){}
 
-    public Account(String primaryOwner, String secondaryOwner, Double penaltyFee, BigDecimal balance) {
-        PrimaryOwner = primaryOwner;
-        SecondaryOwner = secondaryOwner;
-        this.penaltyFee = penaltyFee;
+    public Account(String primaryOwner, String secondaryOwner, BigDecimal balance, BigDecimal penaltyFee) {
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
         this.balance = balance;
+        this.penaltyFee = penaltyFee;
     }
 
     public String getPrimaryOwner() {
-        return PrimaryOwner;
+        return this.primaryOwner;
     }
 
     public void setPrimaryOwner(String primaryOwner) {
-        PrimaryOwner = primaryOwner;
+        this.primaryOwner = primaryOwner;
     }
 
     public String getSecondaryOwner() {
-        return SecondaryOwner;
+        return this.secondaryOwner;
     }
 
     public void setSecondaryOwner(String secondaryOwner) {
-        SecondaryOwner = secondaryOwner;
+        this.secondaryOwner = secondaryOwner;
     }
 
-    public Double getPenaltyFee() {
+    public BigDecimal getPenaltyFee() {
         return penaltyFee;
     }
 
-    public void setPenaltyFee(Double penaltyFee) {
+    public void setPenaltyFee(BigDecimal penaltyFee) {
         this.penaltyFee = penaltyFee;
     }
 

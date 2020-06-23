@@ -5,13 +5,14 @@ import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.classes.Address;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "id")
-public class AccountHolder extends User{
-    private LocalDate dateOfBirthday;
+//@PrimaryKeyJoinColumn(name = "id")
+public class AccountHolder extends SecuredUser{
+    private Date dateOfBirthday;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "country", column = @Column(name = "primary_country")),
@@ -30,23 +31,26 @@ public class AccountHolder extends User{
     private Address mailingAddress;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "accountHolder")
-    public List<Account> accounts;
+    @OneToMany(mappedBy = "primaryOwner")
+    public List<Account> accountsAsPrimaryOwner;
+    @JsonIgnore
+    @OneToMany(mappedBy = "secondaryOwner")
+    public List<Account> accountsAsSecondaryOwner;
 
     public AccountHolder() {}
 
-    public AccountHolder(String name, LocalDate dateOfBirthday, Address primaryAddress, Address mailingAddress) {
-        super(name);
+    public AccountHolder(String name, String username, String password, Date dateOfBirthday, Address primaryAddress, Address mailingAddress) {
+        super(name, username, password);
         this.dateOfBirthday = dateOfBirthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
     }
 
-    public LocalDate getDateOfBirthday() {
+    public Date getDateOfBirthday() {
         return dateOfBirthday;
     }
 
-    public void setDateOfBirthday(LocalDate dateOfBirthday) {
+    public void setDateOfBirthday(Date dateOfBirthday) {
         this.dateOfBirthday = dateOfBirthday;
     }
 
@@ -66,11 +70,19 @@ public class AccountHolder extends User{
         this.mailingAddress = mailingAddress;
     }
 
-    public List<Account> getAccounts() {
-        return accounts;
+    public List<Account> getAccountsAsPrimaryOwner() {
+        return accountsAsPrimaryOwner;
     }
 
-    public void setAccounts(List<Account> accounts) {
-        this.accounts = accounts;
+    public void setAccountsAsPrimaryOwner(List<Account> accountsAsPrimaryOwner) {
+        this.accountsAsPrimaryOwner = accountsAsPrimaryOwner;
+    }
+
+    public List<Account> getAccountsAsSecondaryOwner() {
+        return accountsAsSecondaryOwner;
+    }
+
+    public void setAccountsAsSecondaryOwner(List<Account> accountsAsSecondaryOwner) {
+        this.accountsAsSecondaryOwner = accountsAsSecondaryOwner;
     }
 }

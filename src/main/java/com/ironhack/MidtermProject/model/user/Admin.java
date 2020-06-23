@@ -1,14 +1,13 @@
 package com.ironhack.MidtermProject.model.user;
 
-import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.*;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "id")
-public class Admin extends User{
+//@PrimaryKeyJoinColumn(name = "id")
+public class Admin extends SecuredUser{
     public Admin() {}
 
-    public Admin(String name) {
-        super(name);
+    public Admin(String name, String username, String password) {
+        super(name, username, password);
     }
 }

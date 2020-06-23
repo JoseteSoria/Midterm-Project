@@ -16,7 +16,7 @@ public class ThirdPartyControllerImpl implements ThirdPartyController {
     @Autowired
     private ThirdPartyService thirdPartyService;
 
-    @GetMapping("/thirdParties")
+    @GetMapping("/third-parties")
     @ResponseStatus(code = HttpStatus.OK)
     public List<ThirdParty> findAll(){ return thirdPartyService.findAll(); }
 }

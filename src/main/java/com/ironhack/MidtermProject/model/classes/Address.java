@@ -8,7 +8,6 @@ public class Address {
     private String country;
     private String city;
     private String street;
-    private Integer postalCode;
 
     public String getCountry() {
         return country;
@@ -34,12 +33,5 @@ public class Address {
         this.street = street;
     }
 
-    public Integer getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(Integer postal_code) {
-        this.postalCode = postalCode;
-    }
 }
 

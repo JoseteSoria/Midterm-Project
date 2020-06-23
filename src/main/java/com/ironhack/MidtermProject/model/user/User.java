@@ -2,18 +2,21 @@ package com.ironhack.MidtermProject.model.user;
 
 import javax.persistence.*;
 
+//@MappedSuperclass
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
-    private Integer id;
-    private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Integer id;
+    protected String name;
+    protected String username;
 
     public User() {}
 
-    public User(String name) {
+    public User(String name, String username) {
         this.name = name;
+        this.username = username;
     }
 
     public Integer getId() {
@@ -30,5 +33,13 @@ public abstract class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

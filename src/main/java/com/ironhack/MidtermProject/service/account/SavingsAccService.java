@@ -1,10 +1,13 @@
 package com.ironhack.MidtermProject.service.account;
 
+import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
+import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.repository.account.SavingsAccRepository;
+import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ public class SavingsAccService {
 
     @Autowired
     private SavingsAccRepository savingsAccRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public List<SavingsAcc> findAll(){ return savingsAccRepository.findAll(); }
 
@@ -41,6 +46,8 @@ public class SavingsAccService {
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with thar id"));
         savingsAcc.debitBalance(new Money(amount, currency));
         savingsAccRepository.save(savingsAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.DEBIT );
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -52,5 +59,7 @@ public class SavingsAccService {
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with thar id"));
         savingsAcc.creditBalance(new Money(amount, currency));
         savingsAccRepository.save(savingsAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.CREDIT );
+        transactionRepository.save(transaction);
     }
 }

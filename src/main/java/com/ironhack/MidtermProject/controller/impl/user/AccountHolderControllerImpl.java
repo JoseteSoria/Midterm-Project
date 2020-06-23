@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 
 @RestController
@@ -34,6 +36,13 @@ public class AccountHolderControllerImpl implements AccountHolderController {
     @ResponseStatus(code = HttpStatus.CREATED)
     public AccountHolder create(@RequestBody AccountHolder accountHolder){
         return accountHolderService.store(accountHolder);
+    }
+
+    @PostMapping("/account-holders/transference/{id}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void transference(@PathVariable Integer id, @RequestParam(name = "receiver-account-id") Integer receiver_id,
+                             @RequestParam(name = "amount")BigDecimal amount, @RequestParam (name = "currency", required = false) Currency currency){
+        accountHolderService.prepareTransference(id, receiver_id, amount, currency);
     }
 
 }

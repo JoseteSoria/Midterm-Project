@@ -13,4 +13,7 @@ import java.util.List;
 public interface AccountHolderRepository extends JpaRepository<AccountHolder, Integer> {
     @Query(value = "select a.id, a.balance_amount, a.balance_currency from account a where primary_owner_id =:id", nativeQuery = true)
     List<Object[]> findAccountByOwner(@Param("id") Integer id);
+
+    @Query(value = "select from account a where id =:id", nativeQuery = true)
+    Account findAccountsById(@Param("id") Integer id);
 }

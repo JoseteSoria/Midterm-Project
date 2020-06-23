@@ -1,10 +1,13 @@
 package com.ironhack.MidtermProject.service.account;
 
+import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
+import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.repository.account.CreditCardAccRepository;
+import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ public class CreditCardAccService {
 
     @Autowired
     private CreditCardAccRepository creditCardAccRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public List<CreditCardAcc> findAll(){
         return creditCardAccRepository.findAll();
@@ -43,6 +48,8 @@ public class CreditCardAccService {
                 orElseThrow(()-> new IdNotFoundException("Credit Card account not found with thar id"));
         creditCardAcc.debitBalance(new Money(amount, currency));
         creditCardAccRepository.save(creditCardAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.DEBIT );
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -54,6 +61,8 @@ public class CreditCardAccService {
                 orElseThrow(()-> new IdNotFoundException("Credit card account not found with thar id"));
         creditCardAcc.creditBalance(new Money(amount, currency));
         creditCardAccRepository.save(creditCardAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.CREDIT );
+        transactionRepository.save(transaction);
     }
 
 }

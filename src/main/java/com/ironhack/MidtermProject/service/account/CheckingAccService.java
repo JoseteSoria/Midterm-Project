@@ -1,13 +1,16 @@
 package com.ironhack.MidtermProject.service.account;
 
 import com.ironhack.MidtermProject.dto.CheckingAccCreation;
+import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
+import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 import com.ironhack.MidtermProject.repository.account.CheckingAccRepository;
 import com.ironhack.MidtermProject.repository.account.StudentCheckingAccRepository;
+import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +29,13 @@ public class CheckingAccService {
     private StudentCheckingAccRepository studentCheckingAccRepository;
     @Autowired
     private AccountHolderRepository accountHolderRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public List<CheckingAcc> findAll(){ return checkingAccRepository.findAll(); }
 
     public CheckingAcc findById(Integer id) {
-        return checkingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Checking account not found with thar id"));
+        return checkingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Checking account not found with that id"));
     }
 
     public CheckingAccCreation create(CheckingAccCreation checkingAccCreation){
@@ -68,6 +73,8 @@ public class CheckingAccService {
                 orElseThrow(()-> new IdNotFoundException("Checking account not found with thar id"));
         checkingAcc.debitBalance(new Money(amount, currency));
         checkingAccRepository.save(checkingAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.DEBIT );
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -79,6 +86,8 @@ public class CheckingAccService {
                 orElseThrow(()-> new IdNotFoundException("Checking account not found with thar id"));
         checkingAcc.creditBalance(new Money(amount, currency));
         checkingAccRepository.save(checkingAcc);
+        Transaction transaction = new Transaction(id, new Money(amount, currency), TransactionType.CREDIT );
+        transactionRepository.save(transaction);
     }
 
 }

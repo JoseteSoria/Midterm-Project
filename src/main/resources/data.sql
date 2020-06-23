@@ -6,7 +6,7 @@ insert into user(id, name, username) values
 
 insert into account_holder(id, date_of_birthday, mailing_city, mailing_country, mailing_street, primary_city,
 primary_country, primary_street) values
-(1, '1970-04-21', 'Madrid', 'Spain', 'Gran Via', 'Madrid', 'Spain', 'Canal'),
+(1, '1999-04-21', 'Madrid', 'Spain', 'Gran Via', 'Madrid', 'Spain', 'Canal'),
 (2, '1985-06-13', null, null, null, 'Murcia', 'Spain', 'Traperia'),
 (3, '1960-12-10', 'Pirate Ship', 'Neverland', 'Main Cabin', 'Ocean', 'Neverland', 'Skull Island');
 

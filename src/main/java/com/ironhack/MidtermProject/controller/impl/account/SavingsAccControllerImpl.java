@@ -1,7 +1,6 @@
 package com.ironhack.MidtermProject.controller.impl.account;
 
 import com.ironhack.MidtermProject.controller.interfaces.account.SavingsAccController;
-import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
 import com.ironhack.MidtermProject.service.account.SavingsAccService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,13 @@ public class SavingsAccControllerImpl implements SavingsAccController {
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency){
-        savingsAccService.debitBalance(id, amount, currency);
+        savingsAccService.addBalance(id, amount, currency);
     }
     @PatchMapping("/savings-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency){
-        savingsAccService.creditBalance(id, amount, currency);
+        savingsAccService.reduceBalance(id, amount, currency);
     }
 
     @PostMapping("/savings-accounts")

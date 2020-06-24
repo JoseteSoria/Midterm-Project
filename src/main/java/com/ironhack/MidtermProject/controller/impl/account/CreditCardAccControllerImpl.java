@@ -42,7 +42,7 @@ public class CreditCardAccControllerImpl implements CreditCardAccController {
     public CreditCardAcc store(@RequestBody CreditCardAcc creditCardAcc){
         // We have to create a new account to set the penaltyFee properly
         CreditCardAcc c1 = new CreditCardAcc(creditCardAcc.getPrimaryOwner(),creditCardAcc.getSecondaryOwner(),
-        creditCardAcc.getBalance(),creditCardAcc.getCreditLimit(),creditCardAcc.getInterestRate());
+        creditCardAcc.getCreditLimit(),creditCardAcc.getInterestRate());
         return creditCardAccService.create(c1);
     }
 

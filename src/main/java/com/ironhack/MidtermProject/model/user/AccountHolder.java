@@ -1,6 +1,7 @@
 package com.ironhack.MidtermProject.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.classes.Address;
 
@@ -40,7 +41,7 @@ public class AccountHolder extends SecuredUser{
     public AccountHolder() {}
 
     public AccountHolder(String name, String username, String password, Date dateOfBirthday, Address primaryAddress, Address mailingAddress) {
-        super(name, username, password);
+        super(name, username, Role.ACCOUNT_HOLDER, password);
         this.dateOfBirthday = dateOfBirthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;

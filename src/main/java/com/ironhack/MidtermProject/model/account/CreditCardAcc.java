@@ -1,6 +1,8 @@
 package com.ironhack.MidtermProject.model.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ironhack.MidtermProject.exceptions.NotEnoughMoneyException;
+import com.ironhack.MidtermProject.helper.Helpers;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 
@@ -31,28 +33,20 @@ public class CreditCardAcc extends Account{
     }
 
     /**Constructor without creditLimit nor interestRate or dateInterestRate**/
-    public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
-        super(primaryOwner, secondaryOwner, balance);
+    public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner) {
+        super(primaryOwner, secondaryOwner, new Money(new BigDecimal("0")));
         this.creditLimit = new Money(new BigDecimal("100"));
         this.interestRate = new BigDecimal("0.2");
         this.dateInterestRate = new Date();
     }
 
     /**Constructor with everything**/
-    public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Money creditLimit, BigDecimal interestRate) {
-        super(primaryOwner, secondaryOwner, balance);
+    public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money creditLimit, BigDecimal interestRate) {
+        super(primaryOwner, secondaryOwner, new Money(new BigDecimal("0")));
         setCreditLimit(creditLimit);
         setInterestRate(interestRate);
         this.dateInterestRate = new Date();
     }
-
-//    public Integer getId() {
-//        return id;
-//    }
-//
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
 
     public Money getCreditLimit() {
         return creditLimit;
@@ -101,8 +95,33 @@ public class CreditCardAcc extends Account{
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
             // number of months
             Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            this.creditBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(months)).divide(new BigDecimal("12")))));
+            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(months)).divide(new BigDecimal("12")))));
             setDateInterestRate(new Date());
         }
     }
+
+    @Override
+    public void reduceBalance(Money balance){
+        if (balance.getCurrency()!= this.balance.getCurrency()){
+            balance = Helpers.convertMoney(balance, this.balance);
+        }
+        this.balance.decreaseAmount(balance.getAmount());
+    }
+
+    @Override
+    public void addBalance(Money balance){
+        if (balance.getCurrency()!= this.balance.getCurrency()){
+            balance = Helpers.convertMoney(balance, this.balance);
+        }
+        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){
+            throw new NotEnoughMoneyException("Your balance is above the credit limit.");
+        }
+        this.balance.increaseAmount(balance.getAmount());
+        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){
+            this.getBalance().increaseAmount(this.getPenaltyFee().getAmount());
+        }
+
+    }
+
+
 }

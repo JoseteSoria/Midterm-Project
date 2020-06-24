@@ -1,7 +1,7 @@
 package com.ironhack.MidtermProject.model.account;
 
 import com.ironhack.MidtermProject.enums.Status;
-import com.ironhack.MidtermProject.helper.Helpers;
+import com.ironhack.MidtermProject.exceptions.NotEnoughMoneyException;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 
@@ -99,9 +99,12 @@ public class CheckingAcc extends Account{
     }
 
     @Override
-    public void debitBalance(Money balance){
-        super.debitBalance(balance);
-        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+    public void reduceBalance(Money balance){
+        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
+            throw new NotEnoughMoneyException("Your balance is below the minimum balance");
+        }
+        super.reduceBalance(balance);
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
         }
     }

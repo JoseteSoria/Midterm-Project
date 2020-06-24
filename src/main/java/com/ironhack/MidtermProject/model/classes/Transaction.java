@@ -1,6 +1,7 @@
 package com.ironhack.MidtermProject.model.classes;
 
 import com.ironhack.MidtermProject.enums.TransactionType;
+import org.springframework.transaction.TransactionSuspensionNotSupportedException;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,7 +14,7 @@ public class Transaction {
     private Integer orderingAccountId;
     private Integer beneficiaryAccountId;
     private Money quantity;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
     private Date date;
 
@@ -81,4 +82,6 @@ public class Transaction {
     public void setDate(Date date) {
         this.date = date;
     }
+
+
 }

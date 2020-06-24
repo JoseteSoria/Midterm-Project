@@ -1,5 +1,7 @@
 package com.ironhack.MidtermProject.model.user;
 
+import com.ironhack.MidtermProject.enums.Role;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,7 +13,7 @@ public class ThirdParty extends User{
     public ThirdParty() {}
 
     public ThirdParty(String name, String username, String hashKey) {
-        super(name, username);
+        super(name, username, Role.THIRD_PARTY);
         this.hashKey = hashKey;
     }
 

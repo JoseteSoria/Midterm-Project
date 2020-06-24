@@ -96,14 +96,14 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
     }
 
-    public void creditBalance(Money balance){
+    public void addBalance(Money balance){
         if (balance.getCurrency()!= this.balance.getCurrency()){
             balance = Helpers.convertMoney(balance, this.balance);
         }
         this.balance.increaseAmount(balance.getAmount());
     }
 
-    public void debitBalance(Money balance){
+    public void reduceBalance(Money balance){
         if (balance.getCurrency()!= this.balance.getCurrency()){
             balance = Helpers.convertMoney(balance, this.balance);
         }

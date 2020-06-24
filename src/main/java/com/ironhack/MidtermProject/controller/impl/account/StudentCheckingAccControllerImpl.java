@@ -28,13 +28,13 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency){
-        studentCheckingAccService.debitBalance(id, amount, currency);
+        studentCheckingAccService.addBalance(id, amount, currency);
     }
 
     @PatchMapping("/student-checking-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency){
-        studentCheckingAccService.creditBalance(id, amount, currency);
+        studentCheckingAccService.reduceBalance(id, amount, currency);
     }
 }

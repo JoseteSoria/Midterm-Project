@@ -2,6 +2,7 @@ package com.ironhack.MidtermProject.model.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.enums.Status;
+import com.ironhack.MidtermProject.exceptions.NotEnoughMoneyException;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 
@@ -115,8 +116,11 @@ public class SavingsAcc extends Account{
     }
 
     @Override
-    public void debitBalance(Money balance){
-        super.debitBalance(balance);
+    public void reduceBalance(Money balance){
+        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
+            throw new NotEnoughMoneyException("Your balance is below the minimum balance");
+        }
+        super.reduceBalance(balance);
         if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
         }
@@ -133,7 +137,7 @@ public class SavingsAcc extends Account{
     public void updateDateInterestRate(){
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-31556926000l ))) {
             Integer years = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            this.creditBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(years)))));
+            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(years)))));
             setDateInterestRate(new Date());
         }
     }

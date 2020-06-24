@@ -1,6 +1,10 @@
 package com.ironhack.MidtermProject.model.user;
 
+import com.ironhack.MidtermProject.enums.Role;
+
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 //@MappedSuperclass
 @Entity
@@ -12,11 +16,15 @@ public abstract class User {
     protected String name;
     protected String username;
 
+    @Enumerated(EnumType.STRING)
+    protected Role role;
+
     public User() {}
 
-    public User(String name, String username) {
+    public User(String name, String username, Role role) {
         this.name = name;
         this.username = username;
+        this.role = role;
     }
 
     public Integer getId() {
@@ -41,5 +49,13 @@ public abstract class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

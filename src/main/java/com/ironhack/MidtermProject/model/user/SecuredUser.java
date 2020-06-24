@@ -1,5 +1,7 @@
 package com.ironhack.MidtermProject.model.user;
 
+import com.ironhack.MidtermProject.enums.Role;
+
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
@@ -10,8 +12,8 @@ public class SecuredUser extends User{
     public SecuredUser() {
     }
 
-    public SecuredUser(String name, String username, String password) {
-        super(name, username);
+    public SecuredUser(String name, String username, Role role, String password) {
+        super(name, username, role);
         this.password = password;
     }
 

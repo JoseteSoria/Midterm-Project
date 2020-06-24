@@ -1,5 +1,7 @@
 package com.ironhack.MidtermProject.model.user;
 
+import com.ironhack.MidtermProject.enums.Role;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,6 +10,6 @@ public class Admin extends SecuredUser{
     public Admin() {}
 
     public Admin(String name, String username, String password) {
-        super(name, username, password);
+        super(name, username, Role.ADMIN, password);
     }
 }

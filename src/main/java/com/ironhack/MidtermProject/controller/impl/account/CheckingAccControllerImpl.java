@@ -3,7 +3,6 @@ package com.ironhack.MidtermProject.controller.impl.account;
 import com.ironhack.MidtermProject.controller.interfaces.account.CheckingAccController;
 import com.ironhack.MidtermProject.dto.CheckingAccCreation;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
-import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.service.account.CheckingAccService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,14 +31,14 @@ public class CheckingAccControllerImpl implements CheckingAccController {
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@PathVariable Integer id, @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false)Currency currency){
-        checkingAccService.debitBalance(id, amount, currency);
+        checkingAccService.addBalance(id, amount, currency);
     }
 
     @PatchMapping("/checking-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@PathVariable Integer id, @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false)Currency currency){
-        checkingAccService.creditBalance(id, amount, currency);
+        checkingAccService.reduceBalance(id, amount, currency);
     }
 
     @PostMapping("/checking-accounts")

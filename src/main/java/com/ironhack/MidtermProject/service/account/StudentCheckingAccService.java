@@ -49,7 +49,12 @@ public class StudentCheckingAccService {
             case ACCOUNT_HOLDER:
                 studentCheckingAcc = findById(id);
                 if(studentCheckingAcc.getPrimaryOwner().getId()==user.getId() || studentCheckingAcc.getSecondaryOwner().getId() == user.getId()){
-                    return studentCheckingAcc;
+                    if(checkLoggedIn(user, studentCheckingAcc))
+                    {
+                        return studentCheckingAcc;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -115,7 +120,12 @@ public class StudentCheckingAccService {
                 break;
             case ACCOUNT_HOLDER:
                 if((studentCheckingAcc.getPrimaryOwner()!=null && studentCheckingAcc.getPrimaryOwner().getId()== user.getId()) || (studentCheckingAcc.getSecondaryOwner()!=null && studentCheckingAcc.getSecondaryOwner().getId() == user.getId())){
-                    break;
+                    if(checkLoggedIn(user, studentCheckingAcc))
+                    {
+                        break;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -132,6 +142,14 @@ public class StudentCheckingAccService {
         }
     }
 
+    public boolean checkLoggedIn(User user, StudentCheckingAcc studentCheckingAcc){
+        if((studentCheckingAcc.getPrimaryOwner()!=null && (studentCheckingAcc.getPrimaryOwner().getId() == user.getId()) && studentCheckingAcc.getPrimaryOwner().isLoggedIn()) ||
+                (studentCheckingAcc.getSecondaryOwner()!=null && (studentCheckingAcc.getSecondaryOwner().getId()== user.getId()) && studentCheckingAcc.getSecondaryOwner().isLoggedIn()))
+        {
+            return true;
+        }else
+            return false;
+    }
 
     public StudentCheckingAcc changeStatus(Integer id, String status) {
         Status newStatus;
@@ -142,7 +160,7 @@ public class StudentCheckingAccService {
         }
         StudentCheckingAcc studentCheckingAcc = studentCheckingAccRepository.findById(id).orElseThrow(
                 () -> new IdNotFoundException("No checking account with that id"));
-        if (studentCheckingAcc.getStatus().equals(status))
+        if (studentCheckingAcc.getStatus().equals(newStatus))
             throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
         studentCheckingAcc.setStatus(newStatus);
         studentCheckingAccRepository.save(studentCheckingAcc);

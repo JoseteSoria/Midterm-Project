@@ -1,6 +1,7 @@
 package com.ironhack.MidtermProject.service.user;
 
 import com.ironhack.MidtermProject.dto.AccountMainFields;
+import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.FraudException;
@@ -61,10 +62,10 @@ public class AccountHolderService {
                 break;
             case ACCOUNT_HOLDER:
                 accountHolder = findById(id);
-                if(accountHolder.getId()==user.getId() || accountHolder.getId() == user.getId()){
+                if(accountHolder.getId()==user.getId()){
                     break;
                 }
-                else throw new NoOwnerException("You are not the owner of this account");
+                else throw new NoOwnerException("You are not the account holder who you say you are!");
             case THIRD_PARTY:
                 throw new NoOwnerException("You are a third party. You are not the owner of this account");
         }
@@ -72,11 +73,13 @@ public class AccountHolderService {
     }
 
     public AccountHolder findById(Integer id) {
-        return accountHolderRepository.findById(id).orElseThrow(() -> new IdNotFoundException("Account not found with the id provided"));
+        return accountHolderRepository.findById(id).orElseThrow(() -> new IdNotFoundException("Account holder not found with the id provided"));
     }
 
     public AccountHolder store(AccountHolder accountHolder) {
-        return accountHolderRepository.save(accountHolder);
+        AccountHolder holder = new AccountHolder(accountHolder.getName(), accountHolder.getUsername(),accountHolder.getPassword(),
+                accountHolder.getDateOfBirthday(), accountHolder.getPrimaryAddress(), accountHolder.getMailingAddress());
+        return accountHolderRepository.save(holder);
     }
 
 
@@ -208,6 +211,14 @@ public class AccountHolderService {
             LOGGER.info("TRANSFERENCE TRANSACTION. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
         }
+    }
+
+    public void setLogged(User user, Integer id, boolean loggedIn) {
+        AccountHolder accountHolder = checkFindById(id, user);
+        if(accountHolder.isLoggedIn() == loggedIn)
+            throw new StatusException("Already loggedIn = " + loggedIn + " for this account holder.");
+        accountHolder.setLoggedIn(loggedIn);
+        accountHolderRepository.save(accountHolder);
     }
 
 }

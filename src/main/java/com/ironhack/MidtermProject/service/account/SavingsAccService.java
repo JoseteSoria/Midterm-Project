@@ -53,7 +53,12 @@ public class SavingsAccService {
             case ACCOUNT_HOLDER:
                 savingsAcc = findById(id);
                 if(savingsAcc.getPrimaryOwner().getId()==user.getId() || savingsAcc.getSecondaryOwner().getId() == user.getId()){
-                    return savingsAcc;
+                    if(checkLoggedIn(user, savingsAcc))
+                    {
+                        return savingsAcc;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -70,19 +75,21 @@ public class SavingsAccService {
     }
 
     public SavingsAcc create(SavingsAcc savingsAcc){
+        SavingsAcc s1 = new SavingsAcc(savingsAcc.getPrimaryOwner(),savingsAcc.getSecondaryOwner(), savingsAcc.getBalance(),
+                savingsAcc.getSecretKey(),savingsAcc.getMinimumBalance(),savingsAcc.getInterestRate(),savingsAcc.getStatus());
         AccountHolder primOwner = new AccountHolder();
-        if(savingsAcc.getPrimaryOwner().getId()!=null) {
-            primOwner = accountHolderRepository.findById(savingsAcc.getPrimaryOwner().getId())
+        if(s1.getPrimaryOwner().getId()!=null) {
+            primOwner = accountHolderRepository.findById(s1.getPrimaryOwner().getId())
                     .orElseThrow(() -> new IdNotFoundException("Not primary Owner found with that id"));
         }
         else{
-            primOwner =new AccountHolder(savingsAcc.getPrimaryOwner().getName(),savingsAcc.getPrimaryOwner().getUsername(),
-                    savingsAcc.getPrimaryOwner().getPassword(), savingsAcc.getPrimaryOwner().getDateOfBirthday(),
-                    savingsAcc.getPrimaryOwner().getPrimaryAddress(), savingsAcc.getPrimaryOwner().getMailingAddress());
+            primOwner =new AccountHolder(s1.getPrimaryOwner().getName(),s1.getPrimaryOwner().getUsername(),
+                    s1.getPrimaryOwner().getPassword(), s1.getPrimaryOwner().getDateOfBirthday(),
+                    s1.getPrimaryOwner().getPrimaryAddress(), s1.getPrimaryOwner().getMailingAddress());
         }
         accountHolderRepository.save(primOwner);
-        savingsAcc.setPrimaryOwner(primOwner);
-        return savingsAccRepository.save(savingsAcc);
+        s1.setPrimaryOwner(primOwner);
+        return savingsAccRepository.save(s1);
     }
 
     @Transactional
@@ -138,7 +145,11 @@ public class SavingsAccService {
                 break;
             case ACCOUNT_HOLDER:
                 if((savingsAcc.getPrimaryOwner()!=null && savingsAcc.getPrimaryOwner().getId()== user.getId()) || (savingsAcc.getSecondaryOwner()!=null && savingsAcc.getSecondaryOwner().getId() == user.getId())){
-                    break;
+                    if(checkLoggedIn(user, savingsAcc)) {
+                        break;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -155,6 +166,14 @@ public class SavingsAccService {
         }
     }
 
+    public boolean checkLoggedIn(User user, SavingsAcc savingsAcc){
+        if((savingsAcc.getPrimaryOwner()!=null && (savingsAcc.getPrimaryOwner().getId() == user.getId()) && savingsAcc.getPrimaryOwner().isLoggedIn()) ||
+                (savingsAcc.getSecondaryOwner()!=null && (savingsAcc.getSecondaryOwner().getId()== user.getId()) && savingsAcc.getSecondaryOwner().isLoggedIn()))
+        {
+            return true;
+        }else
+            return false;
+    }
 
     public SavingsAcc changeStatus(Integer id, String status) {
         Status newStatus;
@@ -165,11 +184,10 @@ public class SavingsAccService {
         }
         SavingsAcc savingsAcc = savingsAccRepository.findById(id).orElseThrow(
                 () -> new IdNotFoundException("No checking account with that id"));
-        if (savingsAcc.getStatus().equals(status))
+        if (savingsAcc.getStatus().equals(newStatus))
             throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
         savingsAcc.setStatus(newStatus);
         savingsAccRepository.save(savingsAcc);
         return savingsAcc;
-
     }
 }

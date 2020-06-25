@@ -5,6 +5,7 @@ import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.util.PasswordUtility;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 
 //@MappedSuperclass
@@ -14,11 +15,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
+    @NotNull
     protected String name;
+    @NotNull
     protected String username;
-    @JsonIgnore
+    @NotNull
     protected String password;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     protected Role role;
 

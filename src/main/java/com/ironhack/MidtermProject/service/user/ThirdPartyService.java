@@ -16,6 +16,8 @@ public class ThirdPartyService {
     public List<ThirdParty> findAll(){ return thirdPartyRepository.findAll(); }
 
     public ThirdParty store(ThirdParty thirdParty) {
-        return thirdPartyRepository.save(thirdParty);
+        ThirdParty party = new ThirdParty(thirdParty.getName(), thirdParty.getUsername(), thirdParty.getPassword(),
+        thirdParty.getHashKey());
+        return thirdPartyRepository.save(party);
     }
 }

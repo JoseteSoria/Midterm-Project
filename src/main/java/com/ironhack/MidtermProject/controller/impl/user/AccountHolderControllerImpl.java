@@ -37,15 +37,22 @@ public class AccountHolderControllerImpl implements AccountHolderController {
         return accountHolderService.findAllAccountAsPrimaryOwnerById(id, user);
     }
 
-
     @PostMapping("/account-holders")
     @ResponseStatus(code = HttpStatus.CREATED)
     public AccountHolder create(@RequestBody AccountHolder accountHolder){
         return accountHolderService.store(accountHolder);
     }
 
-    @PostMapping("/account-holders/transference/{id}")
+    @PatchMapping("/account-holders/{id}/logged-in/{looggedIn}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void setLogged(@AuthenticationPrincipal User user, @PathVariable(name = "id") Integer id,
+                          @PathVariable(name = "looggedIn") boolean loggedIn){
+        accountHolderService.setLogged(user, id, loggedIn);
+    }
+
+
+    @PostMapping("/account-holders/transference/{id}")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void transference(@AuthenticationPrincipal User user, @PathVariable Integer id,
                              @RequestParam(name = "receiver-account-id") Integer receiverId,
                              @RequestParam(name = "amount")BigDecimal amount,

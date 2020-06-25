@@ -1,6 +1,7 @@
 package com.ironhack.MidtermProject.model.classes;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class Address {

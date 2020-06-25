@@ -15,4 +15,9 @@ public class AdminService {
     private AdminRepository adminRepository;
 
     public List<Admin> findAll(){ return adminRepository.findAll(); }
+
+    public Admin create(Admin admin) {
+        Admin ad1 = new Admin(admin.getName(), admin.getUsername(), admin.getPassword());
+        return adminRepository.save(ad1);
+    }
 }

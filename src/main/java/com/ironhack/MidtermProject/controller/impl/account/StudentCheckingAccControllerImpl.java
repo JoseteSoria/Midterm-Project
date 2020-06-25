@@ -1,6 +1,7 @@
 package com.ironhack.MidtermProject.controller.impl.account;
 
 import com.ironhack.MidtermProject.controller.interfaces.account.StudentCheckingAccController;
+import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.service.account.StudentCheckingAccService;
@@ -46,5 +47,11 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
                            @RequestParam(name = "secret-key", required = false) String secretKey,
                            @RequestHeader(name = "hash-key", required = false) String header){
         studentCheckingAccService.reduceBalance(user, id, amount, currency, secretKey, header);
+    }
+
+    @PutMapping("/student-checking-accounts/{id}/set-status/{status}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public StudentCheckingAcc changeStatus(@PathVariable Integer id, @PathVariable String status){
+        return studentCheckingAccService.changeStatus(id, status);
     }
 }

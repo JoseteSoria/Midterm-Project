@@ -2,28 +2,28 @@
 insert into user(id, name, username, password, role) values
 (1, 'Peter Pan', 'petpan', '$2a$10$k1D7W/7EpNa6HcjbTa4IreVCwsZc1rs5vzK3299R4LvccU9YAMQ.u', 'ACCOUNT_HOLDER'),
 (2, 'Wendy Darling', 'wendy', '$2a$10$nRYxziFL.ZAvWzzlzeXklOkJ/NJncMTqT8098T9GfUXWvfILyYZK.', 'ACCOUNT_HOLDER'),
-(3, 'James Garfio', 'capgarfio', 'rahwo','ACCOUNT_HOLDER'),
-(4, 'Sir Shrek', 'shogro', 'sdjaghe', 'ACCOUNT_HOLDER'),
-(5, 'Walt Disney', 'wdisney', '34ufdhi34h98', 'ADMIN'),
+(3, 'James Garfio', 'capgarfio', '$2a$10$98cYgbPpZvkVxIvLrphYZeT33ERATVckN/2uAVhbh9F2I/MJys1Ka','ACCOUNT_HOLDER'),
+(4, 'Sir Shrek', 'shogro', '$2a$10$qPX1GZI82zfUQLnFdVolK./cUP9uzbUh1oWDWrVU3.QDlXCvPnc.K', 'ACCOUNT_HOLDER'),
+(5, 'Walt Disney', 'wdisney', '$2a$10$Zy3epOt.2e1qRWMf734V.ew6oCZ8rZERKo/jvnrgSxXjUWGaqylIa', 'ADMIN'),
 (6, 'Admin', 'admin', '$2a$10$YibhRjaKLMpjtofvAOFpveefH0qupJt4/LXGEAY.yzmkWnt8ciHcq', 'ADMIN'),
 (7, 'Tercero', 'tercero', '$2a$10$NQXS7948wqOvTLeHF3jTGeXhGiga5p9L20atvo3PnNo6YQ1J/7gzK', 'THIRD_PARTY');
 
 
-insert into admin values (5);
+insert into admin values (5),(6);
 
 insert into third_party (id, hash_key) values
-(7, '$2a$10$h8OoLWY.3v4ZLLYGwouQh.rzdOGqGekTX1nMTpjQdMHj8Q6SebCu.');
+(7, '$2a$10$mVGwWOIPkHp9PkWtiJzcgeAjwiQk3Ija2JWFA8boAQdiB9k9AWvom');
 
 insert into account_holder(id, date_of_birthday, mailing_city, mailing_country, mailing_street, primary_city,
-primary_country, primary_street) values
-(1, '1999-04-21', 'Madrid', 'Spain', 'Gran Via', 'Madrid', 'Spain', 'Canal'),
-(2, '1985-06-13', null, null, null, 'Murcia', 'Spain', 'Traperia'),
-(3, '1960-12-10', 'Pirate Ship', 'Neverland', 'Main Cabin', 'Ocean', 'Neverland', 'Skull Island'),
-(4, '1990-02-20', 'Wood', 'Dunlop', 'Cienaga', 'Far Far Away', 'Dreamland', 'Royal Palace');
+primary_country, primary_street, logged_in) values
+(1, '1985-04-21', 'Indian camp', 'Neverland', 'Boss Tent', 'LostHood', 'Neverland', 'Tree House', 0),
+(2, '1999-06-13', null, null, null, 'London', 'United Kingdom', 'Trafalgar Square', 0),
+(3, '1960-12-10', 'Pirate Ship', 'Neverland', 'Main Cabin', 'Ocean', 'Neverland', 'Skull Island', 0),
+(4, '1990-02-20', 'Wood', 'Dunlop', 'Cienaga', 'Far Far Away', 'Dreamland', 'Royal Palace', 0);
 
 insert into account (id, balance_amount, balance_currency, penalty_fee_amount, penalty_fee_currency,
 primary_owner_id, secondary_owner_id) values
-(1, 4000, 'USD', 40, 'USD', 1, 2),
+(1, 4000, 'USD', 40, 'USD', 2, 1),
 (2, 2500, 'USD', 40, 'USD', 1, null),
 (3, 1000, 'USD', 40, 'USD', 4, null),
 (4, 9000, 'USD', 40, 'USD', 3, 4);

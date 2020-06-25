@@ -2,6 +2,7 @@ package com.ironhack.MidtermProject.controller.impl.account;
 
 import com.ironhack.MidtermProject.controller.interfaces.account.SavingsAccController;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
+import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.service.account.SavingsAccService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +51,12 @@ public class SavingsAccControllerImpl implements SavingsAccController {
     @PostMapping("/savings-accounts")
     @ResponseStatus(code = HttpStatus.CREATED)
     public SavingsAcc store(@RequestBody SavingsAcc savingsAcc){
-        // We have to create a new account to set the penaltyFee properly
-        SavingsAcc s1 = new SavingsAcc(savingsAcc.getPrimaryOwner(),savingsAcc.getSecondaryOwner(), savingsAcc.getBalance(),
-                savingsAcc.getSecretKey(),savingsAcc.getMinimumBalance(),savingsAcc.getInterestRate(),savingsAcc.getStatus());
-        return savingsAccService.create(s1);
+        return savingsAccService.create(savingsAcc);
     }
+    @PutMapping("/savings-accounts/{id}/set-status/{status}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public SavingsAcc changeStatus(@PathVariable Integer id, @PathVariable String status){
+        return savingsAccService.changeStatus(id, status);
+    }
+
 }

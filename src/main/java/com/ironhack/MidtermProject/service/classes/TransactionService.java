@@ -24,7 +24,7 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByRoleIdNotLike("ADMIN");
         Date lastTransaction = transactionRepository.findLastTransactionDate(transaction.getOrderingId());
         // if 2 transactions is done without 1 second of difference
-        if(lastTransaction!=null && transaction.getDate().before(new Date(lastTransaction.getTime()-1000l))){
+        if(lastTransaction!=null && transaction.getDate().before(new Date(lastTransaction.getTime()+1000l))){
             return false;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

@@ -19,6 +19,8 @@ import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
 import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
 import com.ironhack.MidtermProject.util.PasswordUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,8 @@ public class CheckingAccService {
     private ThirdPartyRepository thirdPartyRepository;
     @Autowired
     private TransactionService transactionService;
+
+    private static final Logger LOGGER = LogManager.getLogger(CheckingAccService.class);
 
     public List<CheckingAcc> findAll(){ return checkingAccRepository.findAll(); }
 
@@ -103,8 +107,9 @@ public class CheckingAccService {
         CheckingAcc checkingAcc = checkingAccRepository.findById(id).
                 orElseThrow(()-> new IdNotFoundException("Checking account not found with that id"));
 
-        Transaction transaction = new Transaction(null, null, checkingAcc, new Money(amount, currency), TransactionType.CREDIT);
+        Transaction transaction = new Transaction(user.getId(), null, checkingAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("CREDIT TRANSACTION CHECKING ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             checkingAcc.reduceBalance(new Money(amount, currency));
         }
@@ -128,6 +133,7 @@ public class CheckingAccService {
 
         Transaction transaction = new Transaction(user.getId(), checkingAcc, null, new Money(amount, currency), TransactionType.DEBIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("DEBIT TRANSACTION CHECKING ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             checkingAcc.addBalance(new Money(amount, currency));
         }

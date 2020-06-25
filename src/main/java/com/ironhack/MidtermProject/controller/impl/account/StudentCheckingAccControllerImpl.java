@@ -33,8 +33,8 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency,
-                              @RequestParam(name = "secretKey", required = false) String secretKey,
-                              @RequestHeader(required = false) String header){
+                              @RequestParam(name = "secret-key", required = false) String secretKey,
+                              @RequestHeader(name = "hash-key", required = false) String header){
         studentCheckingAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
 
@@ -43,8 +43,8 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
     public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,
                            @RequestParam (name = "currency", required = false) Currency currency,
-                           @RequestParam(name = "secretKey", required = false) String secretKey,
-                           @RequestHeader(required = false) String header){
+                           @RequestParam(name = "secret-key", required = false) String secretKey,
+                           @RequestHeader(name = "hash-key", required = false) String header){
         studentCheckingAccService.reduceBalance(user, id, amount, currency, secretKey, header);
     }
 }

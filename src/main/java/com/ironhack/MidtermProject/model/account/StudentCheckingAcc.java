@@ -10,15 +10,19 @@ import java.math.BigDecimal;
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
 public class StudentCheckingAcc extends Account{
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
     private String secretKey;
     @Enumerated(EnumType.STRING)
     private Status status;
 
     public StudentCheckingAcc() {}
 
+    /**Constructor without secretKey**/
+    public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = generateKey();
+        this.status = status;
+    }
+    /**Constructor with everything**/
     public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
@@ -39,6 +43,14 @@ public class StudentCheckingAcc extends Account{
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String generateKey(){
+        String str = "ES";
+        for(int i = 0; i<22; i++) {
+            str += String.valueOf((int)(Math.random()*10));
+        }
+        return str;
     }
 
     public Status getStatus() {

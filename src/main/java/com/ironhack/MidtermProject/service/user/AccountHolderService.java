@@ -15,8 +15,11 @@ import com.ironhack.MidtermProject.model.user.ThirdParty;
 import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.repository.account.*;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
+import com.ironhack.MidtermProject.service.account.StudentCheckingAccService;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
 import com.ironhack.MidtermProject.util.PasswordUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +46,8 @@ public class AccountHolderService {
     private StudentCheckingAccRepository studentCheckingAccRepository;
     @Autowired
     private TransactionService transactionService;
+
+    private static final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
 
     public List<AccountHolder> findAll() {
         return accountHolderRepository.findAll();
@@ -193,12 +198,16 @@ public class AccountHolderService {
         }
         Account sender = accountRepository.findById(id).orElseThrow(()-> new IdNotFoundException("No sender account found"));
         Account receiver = accountRepository.findById(receiverId).orElseThrow(()-> new IdNotFoundException("No receiver account found"));
-        if(!user.getId().equals(sender.getId()))
+        if(!user.getId().equals(sender.getPrimaryOwner().getId())&&!user.getId().equals(sender.getSecondaryOwner().getId()))
             throw new NoOwnerException("You are not the owner of this account");
         Transaction transaction = new Transaction(user.getId(), sender, receiver, transferAmount, TransactionType.TRANSFERENCE);
         boolean transAllowed = makeTransference(transaction);
         if(!transAllowed)
             throw new StatusException("Check accounts status. Something went wrong. Fraud?");
+        else{
+            LOGGER.info("TRANSFERENCE TRANSACTION. USER ORDER-ID : " + user.getId());
+            transactionService.create(transaction);
+        }
     }
 
 }

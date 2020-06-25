@@ -33,8 +33,8 @@ public class CreditCardAccControllerImpl implements CreditCardAccController {
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency,
-                              @RequestParam(name = "secretKey", required = false) String secretKey,
-                              @RequestHeader(required = false) String header){
+                              @RequestParam(name = "secret-key", required = false) String secretKey,
+                              @RequestHeader(name = "hash-key", required = false) String header){
         creditCardAccService.debitBalance(user, id, amount, currency, secretKey, header);
     }
     @PatchMapping("/credit-card-accounts/{id}/credit")
@@ -42,8 +42,8 @@ public class CreditCardAccControllerImpl implements CreditCardAccController {
     public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,
                            @RequestParam (name = "currency", required = false) Currency currency,
-                           @RequestParam(name = "secretKey", required = false) String secretKey,
-                           @RequestHeader(required = false) String header){
+                           @RequestParam(name = "secret-key", required = false) String secretKey,
+                           @RequestHeader(name = "hash-key", required = false) String header){
         creditCardAccService.creditBalance(user, id, amount, currency, secretKey, header);
     }
 

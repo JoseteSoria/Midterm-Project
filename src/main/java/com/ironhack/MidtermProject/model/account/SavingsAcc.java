@@ -35,15 +35,26 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-    /**Constructor without interestRate nor minimumBalance**/
-    public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Status status) {
+    /**Constructor without interestRate nor minimumBalance or secretKey**/
+    public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
-        this.secretKey = secretKey;
+        this.secretKey = getSecretKey();
         this.minimumBalance = new Money(new BigDecimal("1000"));
         this.interestRate = new BigDecimal("0.0025");
         this.status = status;
         this.dateInterestRate = new Date();
     }
+
+    /**Constructor without secretKey**/
+    public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Money minimumBalance, BigDecimal interestRate, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = generateKey();
+        setMinimumBalance(minimumBalance);
+        setInterestRate(interestRate);
+        this.status = status;
+        this.dateInterestRate = new Date();
+    }
+
     /**Constructor with everything**/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, BigDecimal interestRate, Status status) {
         super(primaryOwner, secondaryOwner, balance);
@@ -54,20 +65,20 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-//    public Integer getId() {
-//        return id;
-//    }
-//
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
-
     public String getSecretKey() {
         return secretKey;
     }
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String generateKey(){
+        String str = "ES";
+        for(int i = 0; i<22; i++) {
+            str += String.valueOf((int)(Math.random()*10));
+        }
+        return str;
     }
 
     public Money getMinimumBalance() {

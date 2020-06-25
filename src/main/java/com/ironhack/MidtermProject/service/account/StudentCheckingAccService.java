@@ -16,6 +16,8 @@ import com.ironhack.MidtermProject.repository.account.StudentCheckingAccReposito
 import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
 import com.ironhack.MidtermProject.util.PasswordUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,8 @@ public class StudentCheckingAccService {
     private TransactionService transactionService;
     @Autowired
     private ThirdPartyRepository thirdPartyRepository;
+
+    private static final Logger LOGGER = LogManager.getLogger(StudentCheckingAccService.class);
 
     public List<StudentCheckingAcc> findAll(){ return studentCheckingAccRepository.findAll(); }
 
@@ -68,6 +72,7 @@ public class StudentCheckingAccService {
                 orElseThrow(()-> new IdNotFoundException("Student Checking account not found with that id"));
         Transaction transaction = new Transaction(user.getId(), null, studentCheckingAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("CREDIT TRANSACTION STUDENT-CHECKING ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             studentCheckingAcc.reduceBalance(new Money(amount, currency));
         }
@@ -89,6 +94,7 @@ public class StudentCheckingAccService {
                 orElseThrow(()-> new IdNotFoundException("Student Checking account not found with that id"));
         Transaction transaction = new Transaction(user.getId(), studentCheckingAcc, null, new Money(amount, currency), TransactionType.DEBIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("DEBIT TRANSACTION STUDENT-CHECKING ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             studentCheckingAcc.addBalance(new Money(amount, currency));
         }

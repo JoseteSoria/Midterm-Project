@@ -137,7 +137,7 @@ public class SavingsAcc extends Account{
     public void updateDateInterestRate(){
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-31556926000l ))) {
             Integer years = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(years)))));
+            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.pow(years))));
             setDateInterestRate(new Date());
         }
     }

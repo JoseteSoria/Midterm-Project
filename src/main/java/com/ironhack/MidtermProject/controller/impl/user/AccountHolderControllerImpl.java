@@ -4,9 +4,11 @@ import com.ironhack.MidtermProject.controller.interfaces.user.AccountHolderContr
 import com.ironhack.MidtermProject.dto.AccountMainFields;
 import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
+import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.service.user.AccountHolderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -25,11 +27,15 @@ public class AccountHolderControllerImpl implements AccountHolderController {
 
     @GetMapping("/account-holders/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public AccountHolder findById(@PathVariable Integer id){ return accountHolderService.findById(id); }
+    public AccountHolder findById(@AuthenticationPrincipal User user, @PathVariable Integer id){
+        return accountHolderService.checkFindById(id, user);
+    }
 
     @GetMapping("/account-holders/{id}/accounts")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<AccountMainFields> findAllAccountById(@PathVariable Integer id){ return accountHolderService.findAllAccountAsPrimaryOwnerById(id); }
+    public List<AccountMainFields> findAllAccountById(@AuthenticationPrincipal User user, @PathVariable Integer id){
+        return accountHolderService.findAllAccountAsPrimaryOwnerById(id, user);
+    }
 
 
     @PostMapping("/account-holders")
@@ -40,9 +46,11 @@ public class AccountHolderControllerImpl implements AccountHolderController {
 
     @PostMapping("/account-holders/transference/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void transference(@PathVariable Integer id, @RequestParam(name = "receiver-account-id") Integer receiver_id,
-                             @RequestParam(name = "amount")BigDecimal amount, @RequestParam (name = "currency", required = false) Currency currency){
-        accountHolderService.prepareTransference(id, receiver_id, amount, currency);
+    public void transference(@AuthenticationPrincipal User user, @PathVariable Integer id,
+                             @RequestParam(name = "receiver-account-id") Integer receiverId,
+                             @RequestParam(name = "amount")BigDecimal amount,
+                             @RequestParam (name = "currency", required = false) Currency currency){
+        accountHolderService.prepareTransference(user, id, receiverId, amount, currency);
     }
 
 }

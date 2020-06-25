@@ -5,9 +5,7 @@ import com.ironhack.MidtermProject.model.user.ThirdParty;
 import com.ironhack.MidtermProject.service.user.ThirdPartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,4 +17,10 @@ public class ThirdPartyControllerImpl implements ThirdPartyController {
     @GetMapping("/third-parties")
     @ResponseStatus(code = HttpStatus.OK)
     public List<ThirdParty> findAll(){ return thirdPartyService.findAll(); }
+
+    @PostMapping("/third-parties")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ThirdParty create(@RequestBody ThirdParty thirdParty){
+        return thirdPartyService.store(thirdParty);
+    }
 }

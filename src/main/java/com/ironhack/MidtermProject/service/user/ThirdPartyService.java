@@ -14,4 +14,8 @@ public class ThirdPartyService {
     private ThirdPartyRepository thirdPartyRepository;
 
     public List<ThirdParty> findAll(){ return thirdPartyRepository.findAll(); }
+
+    public ThirdParty store(ThirdParty thirdParty) {
+        return thirdPartyRepository.save(thirdParty);
+    }
 }

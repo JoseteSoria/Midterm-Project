@@ -1,6 +1,8 @@
 package com.ironhack.MidtermProject.model.classes;
 
 import com.ironhack.MidtermProject.enums.TransactionType;
+import com.ironhack.MidtermProject.model.account.Account;
+import com.ironhack.MidtermProject.model.user.AccountHolder;
 import org.springframework.transaction.TransactionSuspensionNotSupportedException;
 
 import javax.persistence.*;
@@ -11,8 +13,11 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer orderingAccountId;
-    private Integer beneficiaryAccountId;
+    private Integer orderingId;
+    @ManyToOne
+    private Account beneficiaryAccount;
+    @ManyToOne
+    private Account senderAccount;
     private Money quantity;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
@@ -20,16 +25,17 @@ public class Transaction {
 
     public Transaction(){}
 
-    public Transaction(Integer orderingAccountId, Money quantity, TransactionType transactionType) {
-        this.orderingAccountId = orderingAccountId;
+    public Transaction(Integer orderingId, Money quantity, TransactionType transactionType) {
+        this.orderingId = orderingId;
         this.quantity = quantity;
         this.transactionType = transactionType;
         this.date = new Date();
     }
 
-    public Transaction(Integer orderingAccountId, Integer beneficiaryAccountId, Money quantity, TransactionType transactionType) {
-        this.orderingAccountId = orderingAccountId;
-        this.beneficiaryAccountId = beneficiaryAccountId;
+    public Transaction(Integer orderingId, Account beneficiaryAccount, Account senderAccount, Money quantity, TransactionType transactionType) {
+        this.orderingId = orderingId;
+        this.beneficiaryAccount = beneficiaryAccount;
+        this.senderAccount = senderAccount;
         this.quantity = quantity;
         this.transactionType = transactionType;
         this.date = new Date();
@@ -43,20 +49,28 @@ public class Transaction {
         this.id = id;
     }
 
-    public Integer getOrderingAccountId() {
-        return orderingAccountId;
+    public Integer getOrderingId() {
+        return orderingId;
     }
 
-    public void setOrderingAccountId(Integer orderingAccountId) {
-        this.orderingAccountId = orderingAccountId;
+    public void setOrderingId(Integer orderingId) {
+        this.orderingId = orderingId;
     }
 
-    public Integer getBeneficiaryAccountId() {
-        return beneficiaryAccountId;
+    public Account getBeneficiaryAccount() {
+        return beneficiaryAccount;
     }
 
-    public void setBeneficiaryAccountId(Integer beneficiaryAccountId) {
-        this.beneficiaryAccountId = beneficiaryAccountId;
+    public void setBeneficiaryAccount(Account beneficiaryAccount) {
+        this.beneficiaryAccount = beneficiaryAccount;
+    }
+
+    public Account getSenderAccount() {
+        return senderAccount;
+    }
+
+    public void setSenderAccount(Account senderAccountId) {
+        this.senderAccount = senderAccountId;
     }
 
     public Money getQuantity() {

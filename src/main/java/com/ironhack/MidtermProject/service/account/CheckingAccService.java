@@ -4,15 +4,21 @@ import com.ironhack.MidtermProject.dto.CheckingAccCreation;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
+import com.ironhack.MidtermProject.exceptions.NoOwnerException;
+import com.ironhack.MidtermProject.exceptions.StatusException;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
+import com.ironhack.MidtermProject.model.user.ThirdParty;
+import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.repository.account.CheckingAccRepository;
 import com.ironhack.MidtermProject.repository.account.StudentCheckingAccRepository;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
+import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
+import com.ironhack.MidtermProject.util.PasswordUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +37,29 @@ public class CheckingAccService {
     @Autowired
     private AccountHolderRepository accountHolderRepository;
     @Autowired
+    private ThirdPartyRepository thirdPartyRepository;
+    @Autowired
     private TransactionService transactionService;
 
     public List<CheckingAcc> findAll(){ return checkingAccRepository.findAll(); }
+
+    public CheckingAcc checkFindById(Integer id, User user) {
+        CheckingAcc checkingAcc = new CheckingAcc();
+        switch(user.getRole()){
+            case ADMIN:
+                checkingAcc = findById(id);
+                break;
+            case ACCOUNT_HOLDER:
+                checkingAcc = findById(id);
+                if(checkingAcc.getPrimaryOwner().getId()==user.getId() || checkingAcc.getSecondaryOwner().getId() == user.getId()){
+                    return checkingAcc;
+                }
+                else throw new NoOwnerException("You are not the owner of this account");
+            case THIRD_PARTY:
+                throw new NoOwnerException("You are a third party. You are not the owner of this account");
+        }
+        return checkingAcc;
+    }
 
     public CheckingAcc findById(Integer id) {
         return checkingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Checking account not found with that id"));
@@ -69,13 +95,15 @@ public class CheckingAccService {
     }
 
     @Transactional
-    public void reduceBalance(Integer id, BigDecimal amount, Currency currency){
+    public void reduceBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+        checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
         }
         CheckingAcc checkingAcc = checkingAccRepository.findById(id).
                 orElseThrow(()-> new IdNotFoundException("Checking account not found with that id"));
-        Transaction transaction = new Transaction(id, null, new Money(amount, currency), TransactionType.CREDIT);
+
+        Transaction transaction = new Transaction(null, null, checkingAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
             transactionService.create(transaction);
             checkingAcc.reduceBalance(new Money(amount, currency));
@@ -90,13 +118,15 @@ public class CheckingAccService {
     }
 
     @Transactional
-    public void addBalance(Integer id, BigDecimal amount, Currency currency){
+    public void addBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+        checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
         }
         CheckingAcc checkingAcc = checkingAccRepository.findById(id).
                 orElseThrow(()-> new IdNotFoundException("Checking account not found with thar id"));
-        Transaction transaction = new Transaction(null, id, new Money(amount, currency), TransactionType.DEBIT);
+
+        Transaction transaction = new Transaction(user.getId(), checkingAcc, null, new Money(amount, currency), TransactionType.DEBIT);
         if(transactionService.checkTransaction(transaction)){
             transactionService.create(transaction);
             checkingAcc.addBalance(new Money(amount, currency));
@@ -109,4 +139,48 @@ public class CheckingAccService {
         checkingAccRepository.save(checkingAcc);
     }
 
+
+    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+        CheckingAcc checkingAcc = findById(id);
+        if(checkingAcc.getStatus().equals(Status.FROZEN))
+            throw new StatusException("This account is frozen");
+        switch(user.getRole()){
+            case ADMIN:
+                break;
+            case ACCOUNT_HOLDER:
+                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()== user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
+                    break;
+                }
+                else throw new NoOwnerException("You are not the owner of this account");
+            case THIRD_PARTY:
+                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
+                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
+                if(header == null || secretKey == null)
+                    throw new NoOwnerException("You are a third party. You have to provide more info.");
+                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
+                    throw new NoOwnerException("Your header is wrong");
+                else if(!secretKey.equals(checkingAcc.getSecretKey()))
+                    throw new NoOwnerException("The secret Key is incorrect for that account");
+                else
+                    break;
+        }
+    }
+
+
+    public CheckingAcc changeStatus(Integer id, String status) {
+        Status newStatus;
+        try {
+            newStatus = Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new StatusException("There's no status " + status.toUpperCase());
+        }
+        CheckingAcc checkingAcc = checkingAccRepository.findById(id).orElseThrow(
+                () -> new IdNotFoundException("No checking account with that id"));
+        if (checkingAcc.getStatus().equals(status))
+            throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
+        checkingAcc.setStatus(newStatus);
+        checkingAccRepository.save(checkingAcc);
+        return checkingAcc;
+
+    }
 }

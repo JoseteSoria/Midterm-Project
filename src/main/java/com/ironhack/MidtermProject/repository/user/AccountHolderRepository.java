@@ -16,4 +16,7 @@ public interface AccountHolderRepository extends JpaRepository<AccountHolder, In
 
     @Query(value = "select from account a where id =:id", nativeQuery = true)
     Account findAccountsById(@Param("id") Integer id);
+
+    @Query(value = "select primary_owner_id, secondary_owner_id from account where id = :accountId ; ", nativeQuery = true)
+    Integer[] findOwnersByAccount(@Param(("accountId")) Integer accountId);
 }

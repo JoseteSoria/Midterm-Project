@@ -55,8 +55,13 @@ public class CheckingAccService {
                 break;
             case ACCOUNT_HOLDER:
                 checkingAcc = findById(id);
-                if(checkingAcc.getPrimaryOwner().getId()==user.getId() || checkingAcc.getSecondaryOwner().getId() == user.getId()){
-                    return checkingAcc;
+                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()==user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
+                    if(checkLoggedIn(user, checkingAcc))
+                    {
+                        return checkingAcc;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -148,14 +153,16 @@ public class CheckingAccService {
 
     private void checkAllowance(User user, Integer id, String secretKey, String header) {
         CheckingAcc checkingAcc = findById(id);
-        if(checkingAcc.getStatus().equals(Status.FROZEN))
-            throw new StatusException("This account is frozen");
         switch(user.getRole()){
             case ADMIN:
                 break;
             case ACCOUNT_HOLDER:
                 if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()== user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
-                    break;
+                    if(checkLoggedIn(user, checkingAcc)) {
+                        break;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -170,8 +177,18 @@ public class CheckingAccService {
                 else
                     break;
         }
+        if(checkingAcc.getStatus().equals(Status.FROZEN))
+            throw new StatusException("This account is frozen");
     }
 
+    public boolean checkLoggedIn(User user, CheckingAcc checkingAcc){
+        if((checkingAcc.getPrimaryOwner()!=null && (checkingAcc.getPrimaryOwner().getId() == user.getId()) && checkingAcc.getPrimaryOwner().isLoggedIn()) ||
+                (checkingAcc.getSecondaryOwner()!=null && (checkingAcc.getSecondaryOwner().getId()== user.getId()) && checkingAcc.getSecondaryOwner().isLoggedIn()))
+        {
+            return true;
+        }else
+            return false;
+    }
 
     public CheckingAcc changeStatus(Integer id, String status) {
         Status newStatus;
@@ -182,7 +199,7 @@ public class CheckingAccService {
         }
         CheckingAcc checkingAcc = checkingAccRepository.findById(id).orElseThrow(
                 () -> new IdNotFoundException("No checking account with that id"));
-        if (checkingAcc.getStatus().equals(status))
+        if (checkingAcc.getStatus().equals(newStatus))
             throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
         checkingAcc.setStatus(newStatus);
         checkingAccRepository.save(checkingAcc);

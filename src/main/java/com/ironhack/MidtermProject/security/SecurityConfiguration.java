@@ -61,12 +61,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/savings-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
                 .mvcMatchers("/savings-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers("/savings-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
+                .mvcMatchers(HttpMethod.PUT,"/savings-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
 
                 //StudentCheckingAcc
                 .mvcMatchers(HttpMethod.GET,"/student-checking-accounts").hasAuthority("ADMIN")
                 .mvcMatchers("/student-checking-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
                 .mvcMatchers("/student-checking-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers("/student-checking-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
+                .mvcMatchers(HttpMethod.PUT,"/student-checking-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
 
                 //Transaction
                 .mvcMatchers("/transactions").hasAuthority("ADMIN")
@@ -76,10 +78,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST,"/account-holders").hasAuthority("ADMIN")
                 .mvcMatchers("/account-holders/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
                 .mvcMatchers("/account-holders/{id}/accounts").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
+                .mvcMatchers("/account-holders/{id}/logged-in/{looggedIn}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/account-holders/transference/{id}").hasAnyAuthority("ACCOUNT_HOLDER")
 
                 //Admin
-                .mvcMatchers("/admins").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.GET,"/admins").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.POST,"/admins").hasAuthority("ADMIN")
 
                 //ThirdParty
                 .mvcMatchers(HttpMethod.GET,"/third-parties").hasAuthority("ADMIN")

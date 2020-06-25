@@ -11,6 +11,6 @@ public class PasswordUtility {
         for(int i = 0; i<22; i++) {
             str += String.valueOf((int)(Math.random()*10));
         }
-        System.out.println(passwordEncoder.encode("tercero"));
+        System.out.println(passwordEncoder.encode("tercero-hashkey"));
     }
 }

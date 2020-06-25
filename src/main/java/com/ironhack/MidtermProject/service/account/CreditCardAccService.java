@@ -8,6 +8,7 @@ import com.ironhack.MidtermProject.exceptions.NoOwnerException;
 import com.ironhack.MidtermProject.exceptions.StatusException;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.CreditCardAcc;
+import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
@@ -55,7 +56,12 @@ public class CreditCardAccService {
             case ACCOUNT_HOLDER:
                 creditCardAcc = findById(id);
                 if(creditCardAcc.getPrimaryOwner().getId()==user.getId() || creditCardAcc.getSecondaryOwner().getId() == user.getId()){
-                    return creditCardAcc;
+                    if(checkLoggedIn(user, creditCardAcc))
+                    {
+                        return creditCardAcc;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -138,7 +144,12 @@ public class CreditCardAccService {
                 break;
             case ACCOUNT_HOLDER:
                 if((creditCardAcc.getPrimaryOwner()!=null && creditCardAcc.getPrimaryOwner().getId()== user.getId()) || (creditCardAcc.getSecondaryOwner()!=null && creditCardAcc.getSecondaryOwner().getId() == user.getId())){
-                    break;
+                    if(checkLoggedIn(user, creditCardAcc))
+                    {
+                        break;
+                    }
+                    else
+                        throw new StatusException("You are not logged in");
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -146,5 +157,13 @@ public class CreditCardAccService {
         }
     }
 
+    public boolean checkLoggedIn(User user, CreditCardAcc creditCardAcc){
+        if((creditCardAcc.getPrimaryOwner()!=null && (creditCardAcc.getPrimaryOwner().getId() == user.getId()) && creditCardAcc.getPrimaryOwner().isLoggedIn()) ||
+                (creditCardAcc.getSecondaryOwner()!=null && (creditCardAcc.getSecondaryOwner().getId()== user.getId()) && creditCardAcc.getSecondaryOwner().isLoggedIn()))
+        {
+            return true;
+        }else
+            return false;
+    }
 
 }

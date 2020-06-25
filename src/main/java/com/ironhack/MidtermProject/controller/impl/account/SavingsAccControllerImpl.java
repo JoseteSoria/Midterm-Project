@@ -33,8 +33,8 @@ public class SavingsAccControllerImpl implements SavingsAccController {
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency,
-                              @RequestParam(name = "secretKey", required = false) String secretKey,
-                              @RequestHeader(required = false) String header){
+                              @RequestParam(name = "secret-key", required = false) String secretKey,
+                              @RequestHeader(name = "hash-key", required = false) String header){
         savingsAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
     @PatchMapping("/savings-accounts/{id}/credit")

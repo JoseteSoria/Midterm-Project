@@ -30,16 +30,16 @@ primary_owner_id, secondary_owner_id) values
 
 insert into checking_acc (id, min_balance_amount, min_balance_currency, month_fee_amount,
 month_fee_currency, secret_key, status) values
-(2, 1000, 'USD', 12, 'USD', 'asjhe263q', 'ACTIVE');
+(2, 1000, 'USD', 12, 'USD', 'ES26342347232349906672', 'ACTIVE');
 
 insert into student_checking_acc (id, secret_key, status) values
-(1, '2iwqdfsqew12', 'ACTIVE');
+(1, 'ES26142554295712900012', 'ACTIVE');
 
 ALTER TABLE savings_acc Modify interest_rate decimal(17,4);
 
 insert into savings_acc (id, date_interest_rate, interest_rate,
 min_balance_amount, min_balance_currency, secret_key, status) values
-(4, '2020-05-22', 0.0025, 200, 'USD', 'mcnvw23', 'ACTIVE');
+(4, '2020-05-22', 0.0025, 200, 'USD', 'ES2490263816471883671', 'ACTIVE');
 
 insert into credit_card_acc(id, credit_limit_amount, credit_limit_currency, date_interest_rate, interest_rate) values
 (3, 50000, 'USD', '2020-05-10', 0.2);

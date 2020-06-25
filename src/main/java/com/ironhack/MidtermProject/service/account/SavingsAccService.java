@@ -18,6 +18,8 @@ import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
 import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
 import com.ironhack.MidtermProject.util.PasswordUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ public class SavingsAccService {
     private AccountHolderRepository accountHolderRepository;
     @Autowired
     private ThirdPartyRepository thirdPartyRepository;
+
+    private static final Logger LOGGER = LogManager.getLogger(SavingsAccService.class);
 
     public List<SavingsAcc> findAll(){ return savingsAccRepository.findAll(); }
 
@@ -91,6 +95,7 @@ public class SavingsAccService {
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with that id"));
         Transaction transaction = new Transaction(user.getId(), null, savingsAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("CREDIT TRANSACTION SAVINGS ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             savingsAcc.reduceBalance(new Money(amount, currency));
         }
@@ -112,6 +117,7 @@ public class SavingsAccService {
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with thar id"));
         Transaction transaction = new Transaction(user.getId(), savingsAcc, null, new Money(amount, currency), TransactionType.DEBIT);
         if(transactionService.checkTransaction(transaction)){
+            LOGGER.info("DEBIT TRANSACTION SAVINGS ACCOUNT. USER ORDER-ID : " + user.getId());
             transactionService.create(transaction);
             savingsAcc.addBalance(new Money(amount, currency));
         }

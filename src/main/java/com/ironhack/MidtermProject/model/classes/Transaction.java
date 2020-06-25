@@ -8,6 +8,7 @@ import org.springframework.transaction.TransactionSuspensionNotSupportedExceptio
 import javax.persistence.*;
 import java.util.Date;
 
+
 @Entity
 public class Transaction {
     @Id

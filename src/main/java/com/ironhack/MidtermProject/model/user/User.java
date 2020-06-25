@@ -2,6 +2,7 @@ package com.ironhack.MidtermProject.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.enums.Role;
+import com.ironhack.MidtermProject.util.PasswordUtility;
 
 import javax.persistence.*;
 
@@ -26,7 +27,7 @@ public class User {
     public User(String name, String username, String password, Role role) {
         this.name = name;
         this.username = username;
-        this.password = password;
+        this.password = PasswordUtility.passwordEncoder.encode(password);
         this.role = role;
     }
 

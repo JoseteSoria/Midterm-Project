@@ -42,6 +42,15 @@ public class CheckingAcc extends Account{
         this.status = status;
     }
 
+    /**Constructor without secretKey**/
+    public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = generateKey();
+        this.minimumBalance = minimumBalance;
+        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
+        this.status = status;
+    }
+
     /**Constructor with everything**/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
         super(primaryOwner, secondaryOwner, balance);
@@ -61,7 +70,12 @@ public class CheckingAcc extends Account{
     }
 
     public String generateKey(){
-        return Base64.getEncoder().encodeToString(LocalDateTime.now().toString().getBytes());
+//        Base64.getEncoder().encodeToString(LocalDateTime.now().toString().getBytes())
+        String str = "ES";
+        for(int i = 0; i<22; i++) {
+            str += String.valueOf((int)(Math.random()*10));
+        }
+        return str;
     }
 
     public Money getMinimumBalance() {

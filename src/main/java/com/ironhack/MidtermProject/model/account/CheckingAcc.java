@@ -13,9 +13,6 @@ import java.util.Base64;
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
 public class CheckingAcc extends Account{
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
     private String secretKey;
     @Embedded
     @AttributeOverrides({
@@ -54,13 +51,6 @@ public class CheckingAcc extends Account{
         this.status = status;
     }
 
-//    public Integer getId() {
-//        return id;
-//    }
-//
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
 
     public String getSecretKey() {
         return secretKey;

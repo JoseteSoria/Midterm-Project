@@ -2,9 +2,11 @@ package com.ironhack.MidtermProject.controller.impl.account;
 
 import com.ironhack.MidtermProject.controller.interfaces.account.SavingsAccController;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
+import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.service.account.SavingsAccService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -22,19 +24,27 @@ public class SavingsAccControllerImpl implements SavingsAccController {
 
     @GetMapping("/savings-accounts/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public SavingsAcc findById(@PathVariable Integer id){ return savingsAccService.findById(id); }
+    public SavingsAcc findById(@AuthenticationPrincipal User user, @PathVariable Integer id){
+        return savingsAccService.checkFindById(id, user);
+    }
 
     @PatchMapping("/savings-accounts/{id}/debit")
     @ResponseStatus(code = HttpStatus.OK)
-    public void reduceBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
-                              @RequestParam (name = "currency", required = false) Currency currency){
-        savingsAccService.addBalance(id, amount, currency);
+    public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
+                              @RequestParam(name = "amount")BigDecimal amount,
+                              @RequestParam (name = "currency", required = false) Currency currency,
+                              @RequestParam(name = "secretKey", required = false) String secretKey,
+                              @RequestHeader(required = false) String header){
+        savingsAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
     @PatchMapping("/savings-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
-    public void addBalance(@PathVariable Integer id, @RequestParam(name = "amount") BigDecimal amount,
-                              @RequestParam (name = "currency", required = false) Currency currency){
-        savingsAccService.reduceBalance(id, amount, currency);
+    public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
+                           @RequestParam(name = "amount")BigDecimal amount,
+                           @RequestParam (name = "currency", required = false) Currency currency,
+                           @RequestParam(name = "secretKey", required = false) String secretKey,
+                           @RequestHeader(required = false) String header){
+        savingsAccService.reduceBalance(user, id, amount, currency, secretKey, header);
     }
 
     @PostMapping("/savings-accounts")

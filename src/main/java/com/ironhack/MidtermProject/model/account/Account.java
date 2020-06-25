@@ -1,13 +1,16 @@
 package com.ironhack.MidtermProject.model.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.exceptions.NoOwnerException;
 import com.ironhack.MidtermProject.exceptions.NotEnoughMoneyException;
 import com.ironhack.MidtermProject.helper.Helpers;
 import com.ironhack.MidtermProject.model.classes.Money;
+import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 //@MappedSuperclass
 @Entity
@@ -33,6 +36,12 @@ public abstract class Account {
     })
     protected Money penaltyFee;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "senderAccount")
+    public List<Transaction> transactionsAsSender;
+    @JsonIgnore
+    @OneToMany(mappedBy = "beneficiaryAccount")
+    public List<Transaction> transactionsAsBeneficiary;
 
     public Account(){}
 

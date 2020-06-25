@@ -6,16 +6,17 @@ import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.FraudException;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.exceptions.NoOwnerException;
+import com.ironhack.MidtermProject.exceptions.StatusException;
 import com.ironhack.MidtermProject.model.account.*;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
-import com.ironhack.MidtermProject.repository.account.CheckingAccRepository;
-import com.ironhack.MidtermProject.repository.account.CreditCardAccRepository;
-import com.ironhack.MidtermProject.repository.account.SavingsAccRepository;
-import com.ironhack.MidtermProject.repository.account.StudentCheckingAccRepository;
+import com.ironhack.MidtermProject.model.user.ThirdParty;
+import com.ironhack.MidtermProject.model.user.User;
+import com.ironhack.MidtermProject.repository.account.*;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
+import com.ironhack.MidtermProject.util.PasswordUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,8 @@ public class AccountHolderService {
 
     @Autowired
     private AccountHolderRepository accountHolderRepository;
-
+    @Autowired
+    private AccountRepository accountRepository;
     @Autowired
     private CheckingAccRepository checkingAccRepository;
     @Autowired
@@ -46,6 +48,24 @@ public class AccountHolderService {
         return accountHolderRepository.findAll();
     }
 
+    public AccountHolder checkFindById(Integer id, User user) {
+        AccountHolder accountHolder = new AccountHolder();
+        switch(user.getRole()){
+            case ADMIN:
+                accountHolder = findById(id);
+                break;
+            case ACCOUNT_HOLDER:
+                accountHolder = findById(id);
+                if(accountHolder.getId()==user.getId() || accountHolder.getId() == user.getId()){
+                    break;
+                }
+                else throw new NoOwnerException("You are not the owner of this account");
+            case THIRD_PARTY:
+                throw new NoOwnerException("You are a third party. You are not the owner of this account");
+        }
+        return accountHolder;
+    }
+
     public AccountHolder findById(Integer id) {
         return accountHolderRepository.findById(id).orElseThrow(() -> new IdNotFoundException("Account not found with the id provided"));
     }
@@ -55,8 +75,8 @@ public class AccountHolderService {
     }
 
 
-    public List<AccountMainFields> findAllAccountAsPrimaryOwnerById(Integer id) {
-        AccountHolder accountHolder = findById(id);
+    public List<AccountMainFields> findAllAccountAsPrimaryOwnerById(Integer id, User user) {
+        AccountHolder accountHolder = checkFindById(id, user);
         List<Object[]> objects = accountHolderRepository.findAccountByOwner(id);
         if (objects == null) throw new NoOwnerException("No accounts found");
         List<AccountMainFields> accountMainFieldsList = new ArrayList<>();
@@ -70,13 +90,13 @@ public class AccountHolderService {
 
     @Transactional
     public boolean makeTransference(Transaction transaction) {
-        Integer senderId = transaction.getOrderingAccountId();
-        Integer receiverId = transaction.getBeneficiaryAccountId();
+        Account senderId = transaction.getSenderAccount();
+        Account receiverId = transaction.getBeneficiaryAccount();
         //Look up for account type for sender
-        CheckingAcc senderCheckingAcc = checkingAccRepository.findById(senderId).orElse(null);
-        StudentCheckingAcc senderStudentCheckingAcc = studentCheckingAccRepository.findById(senderId).orElse(null);
-        CreditCardAcc senderCreditCardAcc = creditCardAccRepository.findById(senderId).orElse(null);
-        SavingsAcc senderSavingsAcc = savingsAccRepository.findById(senderId).orElse(null);
+        CheckingAcc senderCheckingAcc = checkingAccRepository.findById(senderId.getId()).orElse(null);
+        StudentCheckingAcc senderStudentCheckingAcc = studentCheckingAccRepository.findById(senderId.getId()).orElse(null);
+        CreditCardAcc senderCreditCardAcc = creditCardAccRepository.findById(senderId.getId()).orElse(null);
+        SavingsAcc senderSavingsAcc = savingsAccRepository.findById(senderId.getId()).orElse(null);
 
         boolean transactionAllowedSender = false;
 
@@ -89,14 +109,18 @@ public class AccountHolderService {
 
         //Sender
         if (senderCheckingAcc != null) {
-            if (transactionAllowedSender) {
+            if(senderCheckingAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Sender Account FROZEN");
+            else if (transactionAllowedSender) {
                 senderCheckingAcc.reduceBalance(transaction.getQuantity());
             } else {
                 senderCheckingAcc.setStatus(Status.FROZEN);
             }
             checkingAccRepository.save(senderCheckingAcc);
         } else if (senderStudentCheckingAcc != null) {
-            if (transactionAllowedSender) {
+            if(senderStudentCheckingAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Sender Account FROZEN");
+            else if (transactionAllowedSender) {
                 senderStudentCheckingAcc.reduceBalance(transaction.getQuantity());
             } else {
                 senderStudentCheckingAcc.setStatus(Status.FROZEN);
@@ -110,7 +134,9 @@ public class AccountHolderService {
             }
             creditCardAccRepository.save(senderCreditCardAcc);
         } else if (senderSavingsAcc != null) {
-            if (transactionAllowedSender) {
+            if(senderSavingsAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Sender Account FROZEN");
+            else if (transactionAllowedSender) {
                 senderSavingsAcc.reduceBalance(transaction.getQuantity());
             } else {
                 senderSavingsAcc.setStatus(Status.FROZEN);
@@ -126,22 +152,28 @@ public class AccountHolderService {
         }
 
         //Look up for account type for receiver
-        CheckingAcc receiverCheckingAcc = checkingAccRepository.findById(receiverId).orElse(null);
-        StudentCheckingAcc receiverStudentCheckingAcc = studentCheckingAccRepository.findById(receiverId).orElse(null);
-        CreditCardAcc receiverCreditCardAcc = creditCardAccRepository.findById(receiverId).orElse(null);
-        SavingsAcc receiverSavingsAcc = savingsAccRepository.findById(receiverId).orElse(null);
+        CheckingAcc receiverCheckingAcc = checkingAccRepository.findById(receiverId.getId()).orElse(null);
+        StudentCheckingAcc receiverStudentCheckingAcc = studentCheckingAccRepository.findById(receiverId.getId()).orElse(null);
+        CreditCardAcc receiverCreditCardAcc = creditCardAccRepository.findById(receiverId.getId()).orElse(null);
+        SavingsAcc receiverSavingsAcc = savingsAccRepository.findById(receiverId.getId()).orElse(null);
 
         //Receiver
         if (receiverCheckingAcc != null) {
+            if(receiverCheckingAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Receiver Account FROZEN");
             receiverCheckingAcc.addBalance(transaction.getQuantity());
             checkingAccRepository.save(receiverCheckingAcc);
         } else if (receiverStudentCheckingAcc != null) {
+            if(receiverStudentCheckingAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Receiver Account FROZEN");
             receiverStudentCheckingAcc.addBalance(transaction.getQuantity());
             studentCheckingAccRepository.save(receiverStudentCheckingAcc);
         } else if (receiverCreditCardAcc != null) {
             receiverCreditCardAcc.addBalance(transaction.getQuantity());
             creditCardAccRepository.save(receiverCreditCardAcc);
         } else if (receiverSavingsAcc != null) {
+            if(receiverSavingsAcc.getStatus().equals(Status.FROZEN))
+                throw new StatusException("Receiver Account FROZEN");
             receiverSavingsAcc.addBalance(transaction.getQuantity());
             savingsAccRepository.save(receiverSavingsAcc);
         } else if (receiverCheckingAcc == null && receiverStudentCheckingAcc == null &&
@@ -152,14 +184,21 @@ public class AccountHolderService {
 
     }
 
-    public void prepareTransference(Integer id, Integer receiverId, BigDecimal amount, Currency currency) {
+    public void prepareTransference(User user, Integer id, Integer receiverId, BigDecimal amount, Currency currency) {
         Money transferAmount = new Money();;
         if (currency == null) {
             transferAmount = new Money(amount);
         } else {
             transferAmount = new Money(amount, currency);
         }
-        Transaction transaction = new Transaction(id, receiverId, transferAmount, TransactionType.TRANSFERENCE);
+        Account sender = accountRepository.findById(id).orElseThrow(()-> new IdNotFoundException("No sender account found"));
+        Account receiver = accountRepository.findById(receiverId).orElseThrow(()-> new IdNotFoundException("No receiver account found"));
+        if(!user.getId().equals(sender.getId()))
+            throw new NoOwnerException("You are not the owner of this account");
+        Transaction transaction = new Transaction(user.getId(), sender, receiver, transferAmount, TransactionType.TRANSFERENCE);
         boolean transAllowed = makeTransference(transaction);
+        if(!transAllowed)
+            throw new StatusException("Check accounts status. Something went wrong. Fraud?");
     }
+
 }

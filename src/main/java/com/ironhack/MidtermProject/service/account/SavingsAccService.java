@@ -3,13 +3,21 @@ package com.ironhack.MidtermProject.service.account;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
+import com.ironhack.MidtermProject.exceptions.NoOwnerException;
+import com.ironhack.MidtermProject.exceptions.StatusException;
+import com.ironhack.MidtermProject.model.account.CheckingAcc;
+import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
+import com.ironhack.MidtermProject.model.user.ThirdParty;
+import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.repository.account.SavingsAccRepository;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
+import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
+import com.ironhack.MidtermProject.util.PasswordUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +35,28 @@ public class SavingsAccService {
     private TransactionService transactionService;
     @Autowired
     private AccountHolderRepository accountHolderRepository;
+    @Autowired
+    private ThirdPartyRepository thirdPartyRepository;
 
     public List<SavingsAcc> findAll(){ return savingsAccRepository.findAll(); }
+
+    public SavingsAcc checkFindById(Integer id, User user) {
+        SavingsAcc savingsAcc = new SavingsAcc();
+        switch(user.getRole()){
+            case ADMIN:
+                savingsAcc = findById(id);
+                break;
+            case ACCOUNT_HOLDER:
+                savingsAcc = findById(id);
+                if(savingsAcc.getPrimaryOwner().getId()==user.getId() || savingsAcc.getSecondaryOwner().getId() == user.getId()){
+                    return savingsAcc;
+                }
+                else throw new NoOwnerException("You are not the owner of this account");
+            case THIRD_PARTY:
+                throw new NoOwnerException("You are a third party. You are not the owner of this account");
+        }
+        return savingsAcc;
+    }
 
     public SavingsAcc findById(Integer id) {
         SavingsAcc savingsAcc = savingsAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Savings account not found with that id"));
@@ -54,13 +82,14 @@ public class SavingsAccService {
     }
 
     @Transactional
-    public void reduceBalance(Integer id, BigDecimal amount, Currency currency){
+    public void reduceBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+        checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
         }
         SavingsAcc savingsAcc = savingsAccRepository.findById(id).
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with that id"));
-        Transaction transaction = new Transaction(id, null, new Money(amount, currency), TransactionType.CREDIT);
+        Transaction transaction = new Transaction(user.getId(), null, savingsAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
             transactionService.create(transaction);
             savingsAcc.reduceBalance(new Money(amount, currency));
@@ -74,13 +103,14 @@ public class SavingsAccService {
     }
 
     @Transactional
-    public void addBalance(Integer id, BigDecimal amount, Currency currency){
+    public void addBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+        checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
         }
         SavingsAcc savingsAcc = savingsAccRepository.findById(id).
                 orElseThrow(()-> new IdNotFoundException("Savings account not found with thar id"));
-        Transaction transaction = new Transaction(null, id, new Money(amount, currency), TransactionType.DEBIT);
+        Transaction transaction = new Transaction(user.getId(), savingsAcc, null, new Money(amount, currency), TransactionType.DEBIT);
         if(transactionService.checkTransaction(transaction)){
             transactionService.create(transaction);
             savingsAcc.addBalance(new Money(amount, currency));
@@ -91,5 +121,49 @@ public class SavingsAccService {
             savingsAccRepository.save(savingsAcc);
         }
         savingsAccRepository.save(savingsAcc);
+    }
+
+    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+        SavingsAcc savingsAcc = findById(id);
+        if(savingsAcc.getStatus().equals(Status.FROZEN))
+            throw new StatusException("This account is frozen");
+        switch(user.getRole()){
+            case ADMIN:
+                break;
+            case ACCOUNT_HOLDER:
+                if((savingsAcc.getPrimaryOwner()!=null && savingsAcc.getPrimaryOwner().getId()== user.getId()) || (savingsAcc.getSecondaryOwner()!=null && savingsAcc.getSecondaryOwner().getId() == user.getId())){
+                    break;
+                }
+                else throw new NoOwnerException("You are not the owner of this account");
+            case THIRD_PARTY:
+                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
+                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
+                if(header == null || secretKey == null)
+                    throw new NoOwnerException("You are a third party. You have to provide more info.");
+                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
+                    throw new NoOwnerException("Your header is wrong");
+                else if(!secretKey.equals(savingsAcc.getSecretKey()))
+                    throw new NoOwnerException("The secret Key is incorrect for that account");
+                else
+                    break;
+        }
+    }
+
+
+    public SavingsAcc changeStatus(Integer id, String status) {
+        Status newStatus;
+        try {
+            newStatus = Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new StatusException("There's no status " + status.toUpperCase());
+        }
+        SavingsAcc savingsAcc = savingsAccRepository.findById(id).orElseThrow(
+                () -> new IdNotFoundException("No checking account with that id"));
+        if (savingsAcc.getStatus().equals(status))
+            throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
+        savingsAcc.setStatus(newStatus);
+        savingsAccRepository.save(savingsAcc);
+        return savingsAcc;
+
     }
 }

@@ -95,7 +95,8 @@ public class CreditCardAcc extends Account{
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
             // number of months
             Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.multiply(new BigDecimal(months)).divide(new BigDecimal("12")))));
+            Integer times = months/12;
+            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.pow(times))));
             setDateInterestRate(new Date());
         }
     }

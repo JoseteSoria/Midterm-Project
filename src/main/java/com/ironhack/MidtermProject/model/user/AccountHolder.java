@@ -4,14 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.classes.Address;
+import com.ironhack.MidtermProject.model.classes.Transaction;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-//@PrimaryKeyJoinColumn(name = "id")
-public class AccountHolder extends SecuredUser{
+@PrimaryKeyJoinColumn(name = "id")
+public class AccountHolder extends User{
     private Date dateOfBirthday;
 
     @Embedded
@@ -41,7 +42,7 @@ public class AccountHolder extends SecuredUser{
     public AccountHolder() {}
 
     public AccountHolder(String name, String username, String password, Date dateOfBirthday, Address primaryAddress, Address mailingAddress) {
-        super(name, username, Role.ACCOUNT_HOLDER, password);
+        super(name, username, password, Role.ACCOUNT_HOLDER);
         this.dateOfBirthday = dateOfBirthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;

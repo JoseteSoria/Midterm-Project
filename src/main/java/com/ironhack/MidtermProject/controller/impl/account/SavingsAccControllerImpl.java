@@ -29,7 +29,7 @@ public class SavingsAccControllerImpl implements SavingsAccController {
         return savingsAccService.checkFindById(id, user);
     }
 
-    @PatchMapping("/savings-accounts/{id}/debit")
+    @PatchMapping("/savings-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
@@ -38,7 +38,7 @@ public class SavingsAccControllerImpl implements SavingsAccController {
                               @RequestHeader(name = "hash-key", required = false) String header){
         savingsAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
-    @PatchMapping("/savings-accounts/{id}/credit")
+    @PatchMapping("/savings-accounts/{id}/debit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,

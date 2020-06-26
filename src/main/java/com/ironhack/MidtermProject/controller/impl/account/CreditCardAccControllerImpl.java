@@ -30,7 +30,7 @@ public class CreditCardAccControllerImpl implements CreditCardAccController {
 
     @PatchMapping("/credit-card-accounts/{id}/debit")
     @ResponseStatus(code = HttpStatus.OK)
-    public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
+    public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
                               @RequestParam (name = "currency", required = false) Currency currency,
                               @RequestParam(name = "secret-key", required = false) String secretKey,
@@ -39,7 +39,7 @@ public class CreditCardAccControllerImpl implements CreditCardAccController {
     }
     @PatchMapping("/credit-card-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
-    public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
+    public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,
                            @RequestParam (name = "currency", required = false) Currency currency,
                            @RequestParam(name = "secret-key", required = false) String secretKey,

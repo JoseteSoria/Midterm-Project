@@ -1,10 +1,12 @@
 package com.ironhack.MidtermProject.service.account;
 
+import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.exceptions.NoOwnerException;
 import com.ironhack.MidtermProject.exceptions.StatusException;
+import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
@@ -29,7 +31,7 @@ import java.util.Currency;
 import java.util.List;
 
 @Service
-public class SavingsAccService {
+public class SavingsAccService extends AccountService{
 
     @Autowired
     private SavingsAccRepository savingsAccRepository;
@@ -74,22 +76,18 @@ public class SavingsAccService {
         return savingsAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Savings account not found with that id"));
     }
 
-    public SavingsAcc create(SavingsAcc savingsAcc){
-        SavingsAcc s1 = new SavingsAcc(savingsAcc.getPrimaryOwner(),savingsAcc.getSecondaryOwner(), savingsAcc.getBalance(),
-                savingsAcc.getSecretKey(),savingsAcc.getMinimumBalance(),savingsAcc.getInterestRate(),savingsAcc.getStatus());
-        AccountHolder primOwner = new AccountHolder();
-        if(s1.getPrimaryOwner().getId()!=null) {
-            primOwner = accountHolderRepository.findById(s1.getPrimaryOwner().getId())
-                    .orElseThrow(() -> new IdNotFoundException("Not primary Owner found with that id"));
+    public SavingsAcc create(SavingsAcc s1){
+        SavingsAcc savingsAcc = new SavingsAcc(s1.getPrimaryOwner(),s1.getSecondaryOwner(), s1.getBalance(),
+                s1.getSecretKey(),s1.getMinimumBalance(),s1.getInterestRate(),s1.getStatus());
+        AccountHolder[] owners = checkOwner(savingsAcc);
+        accountHolderRepository.save(owners[0]);
+        // Due to flushing issues it has to be repeated the condition to save the data properly
+        if(savingsAcc.getSecondaryOwner()!=null) {
+            accountHolderRepository.save(owners[1]);
+            savingsAcc.setSecondaryOwner(owners[1]);
         }
-        else{
-            primOwner =new AccountHolder(s1.getPrimaryOwner().getName(),s1.getPrimaryOwner().getUsername(),
-                    s1.getPrimaryOwner().getPassword(), s1.getPrimaryOwner().getDateOfBirthday(),
-                    s1.getPrimaryOwner().getPrimaryAddress(), s1.getPrimaryOwner().getMailingAddress());
-        }
-        accountHolderRepository.save(primOwner);
-        s1.setPrimaryOwner(primOwner);
-        return savingsAccRepository.save(s1);
+        savingsAcc.setPrimaryOwner(owners[0]);
+        return savingsAccRepository.save(savingsAcc);
     }
 
     @Transactional
@@ -136,43 +134,14 @@ public class SavingsAccService {
         savingsAccRepository.save(savingsAcc);
     }
 
-    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+    @Override
+    public void checkAllowance(User user, Integer id, String secretKey, String header) {
+        super.checkAllowance(user, id, secretKey, header);
         SavingsAcc savingsAcc = findById(id);
+        if(user.getRole().equals(Role.THIRD_PARTY) && !secretKey.equals(savingsAcc.getSecretKey()))
+            throw new NoOwnerException("The secret-key is incorrect for that account");
         if(savingsAcc.getStatus().equals(Status.FROZEN))
             throw new StatusException("This account is frozen");
-        switch(user.getRole()){
-            case ADMIN:
-                break;
-            case ACCOUNT_HOLDER:
-                if((savingsAcc.getPrimaryOwner()!=null && savingsAcc.getPrimaryOwner().getId()== user.getId()) || (savingsAcc.getSecondaryOwner()!=null && savingsAcc.getSecondaryOwner().getId() == user.getId())){
-                    if(checkLoggedIn(user, savingsAcc)) {
-                        break;
-                    }
-                    else
-                        throw new StatusException("You are not logged in");
-                }
-                else throw new NoOwnerException("You are not the owner of this account");
-            case THIRD_PARTY:
-                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
-                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
-                if(header == null || secretKey == null)
-                    throw new NoOwnerException("You are a third party. You have to provide more info.");
-                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
-                    throw new NoOwnerException("Your header is wrong");
-                else if(!secretKey.equals(savingsAcc.getSecretKey()))
-                    throw new NoOwnerException("The secret Key is incorrect for that account");
-                else
-                    break;
-        }
-    }
-
-    public boolean checkLoggedIn(User user, SavingsAcc savingsAcc){
-        if((savingsAcc.getPrimaryOwner()!=null && (savingsAcc.getPrimaryOwner().getId() == user.getId()) && savingsAcc.getPrimaryOwner().isLoggedIn()) ||
-                (savingsAcc.getSecondaryOwner()!=null && (savingsAcc.getSecondaryOwner().getId()== user.getId()) && savingsAcc.getSecondaryOwner().isLoggedIn()))
-        {
-            return true;
-        }else
-            return false;
     }
 
     public SavingsAcc changeStatus(Integer id, String status) {

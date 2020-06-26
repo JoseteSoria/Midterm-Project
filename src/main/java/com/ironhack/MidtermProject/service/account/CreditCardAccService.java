@@ -30,7 +30,7 @@ import java.util.Currency;
 import java.util.List;
 
 @Service
-public class CreditCardAccService {
+public class CreditCardAccService extends AccountService{
 
     @Autowired
     private CreditCardAccRepository creditCardAccRepository;
@@ -78,23 +78,19 @@ public class CreditCardAccService {
     }
 
     public CreditCardAcc create(CreditCardAcc creditCardAcc){
-        AccountHolder primOwner = new AccountHolder();
-        if(creditCardAcc.getPrimaryOwner().getId()!=null) {
-            primOwner = accountHolderRepository.findById(creditCardAcc.getPrimaryOwner().getId())
-                    .orElseThrow(() -> new IdNotFoundException("Not primary Owner found with that id"));
+        AccountHolder[] owners = checkOwner(creditCardAcc);
+        accountHolderRepository.save(owners[0]);
+        // Due to flushing issues it has to be repeated the condition to save the data properly
+        if(creditCardAcc.getSecondaryOwner()!=null) {
+            accountHolderRepository.save(owners[1]);
+            creditCardAcc.setSecondaryOwner(owners[1]);
         }
-        else{
-            primOwner =new AccountHolder(creditCardAcc.getPrimaryOwner().getName(),creditCardAcc.getPrimaryOwner().getUsername(),
-                    creditCardAcc.getPrimaryOwner().getPassword(), creditCardAcc.getPrimaryOwner().getDateOfBirthday(),
-                    creditCardAcc.getPrimaryOwner().getPrimaryAddress(), creditCardAcc.getPrimaryOwner().getMailingAddress());
-        }
-        accountHolderRepository.save(primOwner);
-        creditCardAcc.setPrimaryOwner(primOwner);
+        creditCardAcc.setPrimaryOwner(owners[0]);
         return creditCardAccRepository.save(creditCardAcc);
     }
 
     @Transactional
-    public void debitBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+    public void creditBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
         checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
@@ -116,7 +112,7 @@ public class CreditCardAccService {
     }
 
     @Transactional
-    public void creditBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
+    public void debitBalance(User user, Integer id, BigDecimal amount, Currency currency, String secretKey, String header){
         checkAllowance(user, id, secretKey, header);
         if(currency == null){
             currency = Currency.getInstance("USD");
@@ -137,7 +133,8 @@ public class CreditCardAccService {
         creditCardAccRepository.save(creditCardAcc);
     }
 
-    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+    @Override
+    public void checkAllowance(User user, Integer id, String secretKey, String header) {
         CreditCardAcc creditCardAcc = findById(id);
         switch(user.getRole()){
             case ADMIN:
@@ -155,15 +152,6 @@ public class CreditCardAccService {
             case THIRD_PARTY:
                 throw new NoOwnerException("You are a third party. You can not access to this credit card");
         }
-    }
-
-    public boolean checkLoggedIn(User user, CreditCardAcc creditCardAcc){
-        if((creditCardAcc.getPrimaryOwner()!=null && (creditCardAcc.getPrimaryOwner().getId() == user.getId()) && creditCardAcc.getPrimaryOwner().isLoggedIn()) ||
-                (creditCardAcc.getSecondaryOwner()!=null && (creditCardAcc.getSecondaryOwner().getId()== user.getId()) && creditCardAcc.getSecondaryOwner().isLoggedIn()))
-        {
-            return true;
-        }else
-            return false;
     }
 
 }

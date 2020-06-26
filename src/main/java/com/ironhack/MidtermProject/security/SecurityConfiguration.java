@@ -40,6 +40,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable();
         httpSecurity.httpBasic();
         httpSecurity.authorizeRequests()
+                //Account
+                .mvcMatchers(HttpMethod.GET, "/accounts").hasAuthority("ADMIN")
+
                 //CheckingAcc
                 .mvcMatchers(HttpMethod.GET, "/checking-accounts").hasAuthority("ADMIN")
                 .mvcMatchers(HttpMethod.POST, "/checking-accounts").hasAuthority("ADMIN")
@@ -78,7 +81,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST,"/account-holders").hasAuthority("ADMIN")
                 .mvcMatchers("/account-holders/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
                 .mvcMatchers("/account-holders/{id}/accounts").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
-                .mvcMatchers("/account-holders/{id}/logged-in/{looggedIn}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
+                .mvcMatchers("/account-holders/logged-in/{looggedIn}").hasAnyAuthority("ACCOUNT_HOLDER")
                 .mvcMatchers("/account-holders/transference/{id}").hasAnyAuthority("ACCOUNT_HOLDER")
 
                 //Admin

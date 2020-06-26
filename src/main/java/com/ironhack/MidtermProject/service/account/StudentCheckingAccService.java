@@ -1,10 +1,12 @@
 package com.ironhack.MidtermProject.service.account;
 
+import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.exceptions.NoOwnerException;
 import com.ironhack.MidtermProject.exceptions.StatusException;
+import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.SavingsAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
@@ -27,7 +29,7 @@ import java.util.Currency;
 import java.util.List;
 
 @Service
-public class StudentCheckingAccService {
+public class StudentCheckingAccService extends AccountService{
 
     @Autowired
     private StudentCheckingAccRepository studentCheckingAccRepository;
@@ -64,7 +66,7 @@ public class StudentCheckingAccService {
     }
 
     public StudentCheckingAcc findById(Integer id) {
-        return studentCheckingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Student Checking account not found with thar id"));
+        return studentCheckingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Student Checking account not found with that id"));
     }
 
     @Transactional
@@ -111,45 +113,16 @@ public class StudentCheckingAccService {
         studentCheckingAccRepository.save(studentCheckingAcc);
     }
 
-    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+    @Override
+    public void checkAllowance(User user, Integer id, String secretKey, String header) {
+        super.checkAllowance(user, id, secretKey, header);
         StudentCheckingAcc studentCheckingAcc = findById(id);
+        if(user.getRole().equals(Role.THIRD_PARTY) && !secretKey.equals(studentCheckingAcc.getSecretKey()))
+            throw new NoOwnerException("The secret-key is incorrect for that account");
         if(studentCheckingAcc.getStatus().equals(Status.FROZEN))
             throw new StatusException("This account is frozen");
-        switch(user.getRole()){
-            case ADMIN:
-                break;
-            case ACCOUNT_HOLDER:
-                if((studentCheckingAcc.getPrimaryOwner()!=null && studentCheckingAcc.getPrimaryOwner().getId()== user.getId()) || (studentCheckingAcc.getSecondaryOwner()!=null && studentCheckingAcc.getSecondaryOwner().getId() == user.getId())){
-                    if(checkLoggedIn(user, studentCheckingAcc))
-                    {
-                        break;
-                    }
-                    else
-                        throw new StatusException("You are not logged in");
-                }
-                else throw new NoOwnerException("You are not the owner of this account");
-            case THIRD_PARTY:
-                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
-                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
-                if(header == null || secretKey == null)
-                    throw new NoOwnerException("You are a third party. You have to provide more info.");
-                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
-                    throw new NoOwnerException("Your header is wrong");
-                else if(!secretKey.equals(studentCheckingAcc.getSecretKey()))
-                    throw new NoOwnerException("The secret Key is incorrect for that account");
-                else
-                    break;
-        }
     }
 
-    public boolean checkLoggedIn(User user, StudentCheckingAcc studentCheckingAcc){
-        if((studentCheckingAcc.getPrimaryOwner()!=null && (studentCheckingAcc.getPrimaryOwner().getId() == user.getId()) && studentCheckingAcc.getPrimaryOwner().isLoggedIn()) ||
-                (studentCheckingAcc.getSecondaryOwner()!=null && (studentCheckingAcc.getSecondaryOwner().getId()== user.getId()) && studentCheckingAcc.getSecondaryOwner().isLoggedIn()))
-        {
-            return true;
-        }else
-            return false;
-    }
 
     public StudentCheckingAcc changeStatus(Integer id, String status) {
         Status newStatus;

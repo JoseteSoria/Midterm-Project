@@ -29,7 +29,7 @@ public class CheckingAccControllerImpl implements CheckingAccController {
         return checkingAccService.checkFindById(id, user);
     }
 
-    @PatchMapping("/checking-accounts/{id}/debit")
+    @PatchMapping("/checking-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
@@ -39,7 +39,7 @@ public class CheckingAccControllerImpl implements CheckingAccController {
         checkingAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
 
-    @PatchMapping("/checking-accounts/{id}/credit")
+    @PatchMapping("/checking-accounts/{id}/debit")
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,

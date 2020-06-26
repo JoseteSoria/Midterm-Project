@@ -11,6 +11,7 @@ insert into user(id, name, username, password, role) values
 
 insert into admin values (5),(6);
 
+-- 7 -> hash-key : tercero-hashkey
 insert into third_party (id, hash_key) values
 (7, '$2a$10$mVGwWOIPkHp9PkWtiJzcgeAjwiQk3Ija2JWFA8boAQdiB9k9AWvom');
 
@@ -19,7 +20,7 @@ primary_country, primary_street, logged_in) values
 (1, '1985-04-21', 'Indian camp', 'Neverland', 'Boss Tent', 'LostHood', 'Neverland', 'Tree House', 0),
 (2, '1999-06-13', null, null, null, 'London', 'United Kingdom', 'Trafalgar Square', 0),
 (3, '1960-12-10', 'Pirate Ship', 'Neverland', 'Main Cabin', 'Ocean', 'Neverland', 'Skull Island', 0),
-(4, '1990-02-20', 'Wood', 'Dunlop', 'Cienaga', 'Far Far Away', 'Dreamland', 'Royal Palace', 0);
+(4, '1990-02-20', 'Wood', 'Dunlop', 'Swamp', 'Far Far Away', 'Dreamland', 'Royal Palace', 0);
 
 insert into account (id, balance_amount, balance_currency, penalty_fee_amount, penalty_fee_currency,
 primary_owner_id, secondary_owner_id) values
@@ -29,8 +30,8 @@ primary_owner_id, secondary_owner_id) values
 (4, 9000, 'USD', 40, 'USD', 3, 4);
 
 insert into checking_acc (id, min_balance_amount, min_balance_currency, month_fee_amount,
-month_fee_currency, secret_key, status) values
-(2, 1000, 'USD', 12, 'USD', 'ES26342347232349906672', 'ACTIVE');
+month_fee_currency, secret_key, date_monthly_maintenance, status) values
+(2, 1000, 'USD', 12, 'USD', 'ES26342347232349906672', '2019-04-10', 'ACTIVE');
 
 insert into student_checking_acc (id, secret_key, status) values
 (1, 'ES26142554295712900012', 'ACTIVE');
@@ -39,10 +40,10 @@ ALTER TABLE savings_acc Modify interest_rate decimal(17,4);
 
 insert into savings_acc (id, date_interest_rate, interest_rate,
 min_balance_amount, min_balance_currency, secret_key, status) values
-(4, '2020-05-22', 0.0025, 200, 'USD', 'ES2490263816471883671', 'ACTIVE');
+(4, '2019-05-22', 0.0025, 200, 'USD', 'ES2490263816471883671', 'ACTIVE');
 
 insert into credit_card_acc(id, credit_limit_amount, credit_limit_currency, date_interest_rate, interest_rate) values
-(3, 50000, 'USD', '2020-05-10', 0.2);
+(3, 50000, 'USD', '2018-04-10', 0.2);
 
 insert into transaction (id, ordering_id, sender_account_id, beneficiary_account_id, amount, currency, date, transaction_type) values
 (1, 1, 1, 2, 1000, 'USD', '2020-06-23', 'TRANSFERENCE'),

@@ -20,13 +20,13 @@ public class StudentCheckingAcc extends Account{
     public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
-        this.status = status;
+        setStatus(status);
     }
     /**Constructor with everything**/
     public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
-        this.status = status;
+        setStatus(status);
     }
 
 //    public Integer getId() {
@@ -58,7 +58,7 @@ public class StudentCheckingAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        if(status == null) this.status = Status.ACTIVE;
+        else this.status = status;
     }
-
 }

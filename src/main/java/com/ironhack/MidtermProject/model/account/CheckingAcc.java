@@ -1,5 +1,6 @@
 package com.ironhack.MidtermProject.model.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.exceptions.NotEnoughMoneyException;
 import com.ironhack.MidtermProject.model.classes.Money;
@@ -7,8 +8,10 @@ import com.ironhack.MidtermProject.model.user.AccountHolder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Date;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
@@ -26,6 +29,8 @@ public class CheckingAcc extends Account{
             @AttributeOverride(name = "currency",column = @Column(name = "monthFee_currency")),
     })
     private Money monthlyMaintenanceFee;
+    @JsonIgnore
+    private Date dateMonthlyMaintenance;
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -39,7 +44,7 @@ public class CheckingAcc extends Account{
         this.secretKey = generateKey();
         this.minimumBalance = new Money(new BigDecimal("250"));
         this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
-        this.status = status;
+        setStatus(status);
     }
 
     /**Constructor without secretKey**/
@@ -48,7 +53,7 @@ public class CheckingAcc extends Account{
         this.secretKey = generateKey();
         this.minimumBalance = minimumBalance;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-        this.status = status;
+        setStatus(status);
     }
 
     /**Constructor with everything**/
@@ -99,17 +104,38 @@ public class CheckingAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        if(status == null) this.status = Status.ACTIVE;
+        else this.status = status;
+    }
+
+    public Date getDateMonthlyMaintenance() {
+        return dateMonthlyMaintenance;
+    }
+
+    public void setDateMonthlyMaintenance(Date dateMonthlyMaintenance) {
+        this.dateMonthlyMaintenance = dateMonthlyMaintenance;
     }
 
     @Override
     public void reduceBalance(Money balance){
-        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
-            throw new NotEnoughMoneyException("Your balance is below the minimum balance");
+        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+            throw new NotEnoughMoneyException("Your balance has reach the minimum balance");
         }
         super.reduceBalance(balance);
         if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
+        }
+    }
+
+    public void updateDateInterestRate() {
+        // if more than a month
+        if(this.dateMonthlyMaintenance.before(new Date(System.currentTimeMillis()-2629743000l ))) {
+            // number of months
+            Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateMonthlyMaintenance.getTime())/2629743000l));
+            for(int i = 0; i< months; i++){
+                this.reduceBalance(this.monthlyMaintenanceFee);
+            }
+            setDateMonthlyMaintenance(new Date(this.getDateMonthlyMaintenance().getTime()+(months*2629743000l)));
         }
     }
 }

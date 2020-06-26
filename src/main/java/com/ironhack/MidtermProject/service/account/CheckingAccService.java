@@ -1,12 +1,15 @@
 package com.ironhack.MidtermProject.service.account;
 
 import com.ironhack.MidtermProject.dto.CheckingAccCreation;
+import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.exceptions.IdNotFoundException;
 import com.ironhack.MidtermProject.exceptions.NoOwnerException;
 import com.ironhack.MidtermProject.exceptions.StatusException;
+import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
+import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
@@ -31,7 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class CheckingAccService {
+public class CheckingAccService extends AccountService{
     @Autowired
     private CheckingAccRepository checkingAccRepository;
     @Autowired
@@ -71,35 +74,42 @@ public class CheckingAccService {
     }
 
     public CheckingAcc findById(Integer id) {
+        CheckingAcc checkingAcc = checkingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Credit Card account not found with that id"));
+        checkingAcc.updateDateInterestRate();
+        checkingAccRepository.save(checkingAcc);
         return checkingAccRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Checking account not found with that id"));
     }
 
     public CheckingAccCreation create(CheckingAccCreation checkingAccCreation){
-        AccountHolder primOwner = new AccountHolder();
-        if(checkingAccCreation.getPrimaryOwner().getId()!=null) {
-            primOwner = accountHolderRepository.findById(checkingAccCreation.getPrimaryOwner().getId())
-                    .orElseThrow(() -> new IdNotFoundException("Not primary Owner found with that id"));
+        // An account is needed to call the checkOwner method bus account is abstract. StudentCheckingAcc is the simplest one
+        Account account = new StudentCheckingAcc(checkingAccCreation.getPrimaryOwner(),
+                checkingAccCreation.getSecondaryOwner(), checkingAccCreation.getBalance(), Status.ACTIVE);
+        AccountHolder[] owners = checkOwner(account);
+        accountHolderRepository.save(owners[0]);
+        if(checkingAccCreation.getSecondaryOwner()!=null) {
+            accountHolderRepository.save(owners[1]);
         }
-        else{
-            primOwner =new AccountHolder(checkingAccCreation.getPrimaryOwner().getName(),checkingAccCreation.getPrimaryOwner().getUsername(),
-                    checkingAccCreation.getPrimaryOwner().getPassword(), checkingAccCreation.getPrimaryOwner().getDateOfBirthday(),
-                    checkingAccCreation.getPrimaryOwner().getPrimaryAddress(), checkingAccCreation.getPrimaryOwner().getMailingAddress());
-        }
-        accountHolderRepository.save(primOwner);
-        if(primOwner.getDateOfBirthday().after(new Date(System.currentTimeMillis()-31556926000l * 24))){
-            StudentCheckingAcc studentCheckingAcc = new StudentCheckingAcc(primOwner, checkingAccCreation.getSecondaryOwner(),
+        if(owners[0].getDateOfBirthday().after(new Date(System.currentTimeMillis()-31556926000l * 24))){
+            StudentCheckingAcc studentCheckingAcc = new StudentCheckingAcc(owners[0], checkingAccCreation.getSecondaryOwner(),
                     checkingAccCreation.getBalance(),checkingAccCreation.getSecretKey(),checkingAccCreation.getStatus());
-            studentCheckingAcc.setPrimaryOwner(primOwner);
+            studentCheckingAcc.setPrimaryOwner(owners[0]);
+            if(checkingAccCreation.getSecondaryOwner()!=null) {
+                studentCheckingAcc.setSecondaryOwner(owners[1]);
+            }
             studentCheckingAccRepository.save(studentCheckingAcc);
             checkingAccCreation.setType("StudentChecking Account");
         }
         else{
             CheckingAcc checkingAcc = new CheckingAcc(checkingAccCreation.getPrimaryOwner(),checkingAccCreation.getSecondaryOwner(),
                     checkingAccCreation.getBalance(),checkingAccCreation.getStatus());
-            checkingAcc.setPrimaryOwner(primOwner);
+            checkingAcc.setPrimaryOwner(owners[0]);
+            if(checkingAccCreation.getSecondaryOwner()!=null) {
+                checkingAcc.setSecondaryOwner(owners[1]);
+            }
             checkingAccRepository.save(checkingAcc);
             checkingAccCreation.setType("Checking Account");
         }
+        checkingAccCreation.setPrimaryOwner(owners[0]);
         return checkingAccCreation;
     }
 
@@ -150,45 +160,46 @@ public class CheckingAccService {
         checkingAccRepository.save(checkingAcc);
     }
 
-
-    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+    @Override
+    public void checkAllowance(User user, Integer id, String secretKey, String header) {
+        super.checkAllowance(user, id, secretKey, header);
         CheckingAcc checkingAcc = findById(id);
-        switch(user.getRole()){
-            case ADMIN:
-                break;
-            case ACCOUNT_HOLDER:
-                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()== user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
-                    if(checkLoggedIn(user, checkingAcc)) {
-                        break;
-                    }
-                    else
-                        throw new StatusException("You are not logged in");
-                }
-                else throw new NoOwnerException("You are not the owner of this account");
-            case THIRD_PARTY:
-                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
-                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
-                if(header == null || secretKey == null)
-                    throw new NoOwnerException("You are a third party. You have to provide more info.");
-                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
-                    throw new NoOwnerException("Your header is wrong");
-                else if(!secretKey.equals(checkingAcc.getSecretKey()))
-                    throw new NoOwnerException("The secret Key is incorrect for that account");
-                else
-                    break;
-        }
+        if(user.getRole().equals(Role.THIRD_PARTY) && !secretKey.equals(checkingAcc.getSecretKey()))
+            throw new NoOwnerException("The secret-key is incorrect for that account");
         if(checkingAcc.getStatus().equals(Status.FROZEN))
             throw new StatusException("This account is frozen");
     }
 
-    public boolean checkLoggedIn(User user, CheckingAcc checkingAcc){
-        if((checkingAcc.getPrimaryOwner()!=null && (checkingAcc.getPrimaryOwner().getId() == user.getId()) && checkingAcc.getPrimaryOwner().isLoggedIn()) ||
-                (checkingAcc.getSecondaryOwner()!=null && (checkingAcc.getSecondaryOwner().getId()== user.getId()) && checkingAcc.getSecondaryOwner().isLoggedIn()))
-        {
-            return true;
-        }else
-            return false;
-    }
+
+    //    private void checkAllowance(User user, Integer id, String secretKey, String header) {
+//        CheckingAcc checkingAcc = findById(id);
+//        switch(user.getRole()){
+//            case ADMIN:
+//                break;
+//            case ACCOUNT_HOLDER:
+//                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()== user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
+//                    if(checkLoggedIn(user, checkingAcc)) {
+//                        break;
+//                    }
+//                    else
+//                        throw new StatusException("You are not logged in");
+//                }
+//                else throw new NoOwnerException("You are not the owner of this account");
+//            case THIRD_PARTY:
+//                ThirdParty thirdParty = thirdPartyRepository.findById(user.getId())
+//                        .orElseThrow(()-> new IdNotFoundException("No third party found"));
+//                if(header == null || secretKey == null)
+//                    throw new NoOwnerException("You are a third party. You have to provide more info.");
+//                else if(!PasswordUtility.passwordEncoder.matches(header, thirdParty.getHashKey()))
+//                    throw new NoOwnerException("Your header is wrong");
+//                else if(!secretKey.equals(checkingAcc.getSecretKey()))
+//                    throw new NoOwnerException("The secret Key is incorrect for that account");
+//                else
+//                    break;
+//        }
+//        if(checkingAcc.getStatus().equals(Status.FROZEN))
+//            throw new StatusException("This account is frozen");
+//    }
 
     public CheckingAcc changeStatus(Integer id, String status) {
         Status newStatus;

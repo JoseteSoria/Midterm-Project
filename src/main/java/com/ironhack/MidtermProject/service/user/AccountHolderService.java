@@ -213,8 +213,8 @@ public class AccountHolderService {
         }
     }
 
-    public void setLogged(User user, Integer id, boolean loggedIn) {
-        AccountHolder accountHolder = checkFindById(id, user);
+    public void setLogged(User user, boolean loggedIn) {
+        AccountHolder accountHolder = checkFindById(user.getId(), user);
         if(accountHolder.isLoggedIn() == loggedIn)
             throw new StatusException("Already loggedIn = " + loggedIn + " for this account holder.");
         accountHolder.setLoggedIn(loggedIn);

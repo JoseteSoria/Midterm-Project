@@ -8,6 +8,7 @@ import com.ironhack.MidtermProject.model.user.AccountHolder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 @Entity
@@ -95,9 +96,17 @@ public class CreditCardAcc extends Account{
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
             // number of months
             Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            Integer times = months/12;
-            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.pow(times))));
-            setDateInterestRate(new Date());
+            BigDecimal monthlyInterestRate = (this.interestRate).divide(new BigDecimal("12"),4, RoundingMode.HALF_EVEN);
+            try{
+                for(int i = 0; i< months; i++){
+                    this.addBalance(new Money(this.balance.getAmount().multiply(monthlyInterestRate)));
+                }
+            }catch (NotEnoughMoneyException e){
+                this.balance = this.creditLimit;
+            }
+            finally{
+                setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(months*2629743000l)));
+            }
         }
     }
 
@@ -114,8 +123,8 @@ public class CreditCardAcc extends Account{
         if (balance.getCurrency()!= this.balance.getCurrency()){
             balance = Helpers.convertMoney(balance, this.balance);
         }
-        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){
-            throw new NotEnoughMoneyException("Your balance is above the credit limit.");
+        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>=0){
+            throw new NotEnoughMoneyException("Your balance has reach the credit limit.");
         }
         this.balance.increaseAmount(balance.getAmount());
         if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){

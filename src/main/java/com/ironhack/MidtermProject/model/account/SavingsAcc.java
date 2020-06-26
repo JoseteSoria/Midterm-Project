@@ -51,7 +51,7 @@ public class SavingsAcc extends Account{
         this.secretKey = generateKey();
         setMinimumBalance(minimumBalance);
         setInterestRate(interestRate);
-        this.status = status;
+        setStatus(status);
         this.dateInterestRate = new Date();
     }
 
@@ -61,7 +61,7 @@ public class SavingsAcc extends Account{
         this.secretKey = secretKey;
         setMinimumBalance(minimumBalance);
         setInterestRate(interestRate);
-        this.status = status;
+        setStatus(status);
         this.dateInterestRate = new Date();
     }
 
@@ -103,7 +103,8 @@ public class SavingsAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        if(status == null) this.status = Status.ACTIVE;
+        else this.status = status;
     }
 
     public BigDecimal getInterestRate() {
@@ -128,11 +129,11 @@ public class SavingsAcc extends Account{
 
     @Override
     public void reduceBalance(Money balance){
-        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
-            throw new NotEnoughMoneyException("Your balance is below the minimum balance");
+        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+            throw new NotEnoughMoneyException("Your balance has reach the minimum balance");
         }
         super.reduceBalance(balance);
-        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
         }
     }
@@ -147,9 +148,11 @@ public class SavingsAcc extends Account{
 
     public void updateDateInterestRate(){
         if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-31556926000l ))) {
-            Integer years = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            this.addBalance(new Money(this.balance.getAmount().multiply(interestRate.pow(years))));
-            setDateInterestRate(new Date());
+            Integer years = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/31556926000l));
+                for (int i = 0; i < years; i++) {
+                    this.addBalance(new Money(this.balance.getAmount().multiply(this.interestRate)));
+                }
+            setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(years*31556926000l)));
         }
     }
 

@@ -43,11 +43,11 @@ public class AccountHolderControllerImpl implements AccountHolderController {
         return accountHolderService.store(accountHolder);
     }
 
-    @PatchMapping("/account-holders/{id}/logged-in/{looggedIn}")
+    @PatchMapping("/account-holders/logged-in/{looggedIn}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void setLogged(@AuthenticationPrincipal User user, @PathVariable(name = "id") Integer id,
+    public void setLogged(@AuthenticationPrincipal User user,
                           @PathVariable(name = "looggedIn") boolean loggedIn){
-        accountHolderService.setLogged(user, id, loggedIn);
+        accountHolderService.setLogged(user, loggedIn);
     }
 
 

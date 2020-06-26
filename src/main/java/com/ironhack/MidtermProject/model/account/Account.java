@@ -47,7 +47,7 @@ public abstract class Account {
 
     public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
         setOwners(primaryOwner,secondaryOwner);
-        this.balance = balance;
+        setBalance(balance);
         this.penaltyFee = new Money(new BigDecimal("40"));
     }
 
@@ -72,6 +72,7 @@ public abstract class Account {
     }
 
     public void setBalance(Money balance) {
+        if(this.balance == null) this.balance = new Money(new BigDecimal("0"));
         this.balance = balance;
     }
 

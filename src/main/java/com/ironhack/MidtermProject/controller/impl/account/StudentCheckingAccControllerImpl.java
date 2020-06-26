@@ -29,7 +29,7 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
         return studentCheckingAccService.checkFindById(id, user);
     }
 
-    @PatchMapping("/student-checking-accounts/{id}/debit")
+    @PatchMapping("/student-checking-accounts/{id}/credit")
     @ResponseStatus(code = HttpStatus.OK)
     public void reduceBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                               @RequestParam(name = "amount")BigDecimal amount,
@@ -39,7 +39,7 @@ public class StudentCheckingAccControllerImpl implements StudentCheckingAccContr
         studentCheckingAccService.addBalance(user, id, amount, currency, secretKey, header);
     }
 
-    @PatchMapping("/student-checking-accounts/{id}/credit")
+    @PatchMapping("/student-checking-accounts/{id}/debit")
     @ResponseStatus(code = HttpStatus.OK)
     public void addBalance(@AuthenticationPrincipal User user, @PathVariable Integer id,
                            @RequestParam(name = "amount")BigDecimal amount,

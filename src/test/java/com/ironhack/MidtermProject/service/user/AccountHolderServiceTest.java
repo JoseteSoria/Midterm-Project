@@ -142,14 +142,14 @@ class AccountHolderServiceTest {
 
     @Test
     void setLogged_Correct(){
-        accountHolderService.setLogged(ah1, true);
+        accountHolderService.setLogged(ah1, false);
         AccountHolder accountHolder = accountHolderRepository.findById(ah1.getId()).get();
-        assertEquals(true, accountHolder.isLoggedIn());
+        assertEquals(false, accountHolder.isLoggedIn());
     }
 
     @Test
     void setLogged_Already_Exception(){
-        assertThrows(StatusException.class, ()->accountHolderService.setLogged(ah1, false));
+        assertThrows(StatusException.class, ()->accountHolderService.setLogged(ah1, true));
     }
 
     @Test

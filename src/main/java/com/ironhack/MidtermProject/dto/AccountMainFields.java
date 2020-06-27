@@ -9,9 +9,9 @@ public class AccountMainFields {
 
     public AccountMainFields(){}
     public AccountMainFields(Integer id, String ownerName, Money balance) {
-        this.id = id;
-        this.ownerName = ownerName;
-        this.balance = balance;
+        setId(id);
+        setOwnerName(ownerName);
+        setBalance(balance);
     }
 
     public Integer getId() {

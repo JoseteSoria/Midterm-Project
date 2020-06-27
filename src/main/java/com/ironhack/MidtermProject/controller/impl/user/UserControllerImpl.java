@@ -22,5 +22,4 @@ public class UserControllerImpl implements UserController {
         return userService.findAll();
     }
 
-
 }

@@ -18,6 +18,7 @@ import com.ironhack.MidtermProject.model.user.ThirdParty;
 import com.ironhack.MidtermProject.model.user.User;
 import com.ironhack.MidtermProject.repository.account.CheckingAccRepository;
 import com.ironhack.MidtermProject.repository.account.StudentCheckingAccRepository;
+import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
 import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
 import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
@@ -45,6 +46,8 @@ public class CheckingAccService extends AccountService{
     private ThirdPartyRepository thirdPartyRepository;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     private static final Logger LOGGER = LogManager.getLogger(CheckingAccService.class);
 
@@ -58,7 +61,7 @@ public class CheckingAccService extends AccountService{
                 break;
             case ACCOUNT_HOLDER:
                 checkingAcc = findById(id);
-                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId()==user.getId()) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId() == user.getId())){
+                if((checkingAcc.getPrimaryOwner()!=null && checkingAcc.getPrimaryOwner().getId().equals(user.getId())) || (checkingAcc.getSecondaryOwner()!=null && checkingAcc.getSecondaryOwner().getId().equals(user.getId()))){
                     if(checkLoggedIn(user, checkingAcc))
                     {
                         return checkingAcc;
@@ -125,7 +128,7 @@ public class CheckingAccService extends AccountService{
         Transaction transaction = new Transaction(user.getId(), null, checkingAcc, new Money(amount, currency), TransactionType.CREDIT);
         if(transactionService.checkTransaction(transaction)){
             LOGGER.info("CREDIT TRANSACTION CHECKING ACCOUNT. USER ORDER-ID : " + user.getId());
-            transactionService.create(transaction);
+            transactionRepository.save(transaction);
             checkingAcc.reduceBalance(new Money(amount, currency));
         }
         else{
@@ -171,6 +174,22 @@ public class CheckingAccService extends AccountService{
     }
 
 
+    public CheckingAcc changeStatus(Integer id, String status) {
+        Status newStatus;
+        try {
+            newStatus = Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new StatusException("There's no status " + status.toUpperCase());
+        }
+        CheckingAcc checkingAcc = checkingAccRepository.findById(id).orElseThrow(
+                () -> new IdNotFoundException("No checking account with that id"));
+        if (checkingAcc.getStatus().equals(newStatus))
+            throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
+        checkingAcc.setStatus(newStatus);
+        checkingAccRepository.save(checkingAcc);
+        return checkingAcc;
+    }
+
     //    private void checkAllowance(User user, Integer id, String secretKey, String header) {
 //        CheckingAcc checkingAcc = findById(id);
 //        switch(user.getRole()){
@@ -201,20 +220,4 @@ public class CheckingAccService extends AccountService{
 //            throw new StatusException("This account is frozen");
 //    }
 
-    public CheckingAcc changeStatus(Integer id, String status) {
-        Status newStatus;
-        try {
-            newStatus = Status.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new StatusException("There's no status " + status.toUpperCase());
-        }
-        CheckingAcc checkingAcc = checkingAccRepository.findById(id).orElseThrow(
-                () -> new IdNotFoundException("No checking account with that id"));
-        if (checkingAcc.getStatus().equals(newStatus))
-            throw new StatusException("The opportunity with id " + id + " is already " + newStatus);
-        checkingAcc.setStatus(newStatus);
-        checkingAccRepository.save(checkingAcc);
-        return checkingAcc;
-
-    }
 }

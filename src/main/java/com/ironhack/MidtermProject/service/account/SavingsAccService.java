@@ -54,7 +54,7 @@ public class SavingsAccService extends AccountService{
                 break;
             case ACCOUNT_HOLDER:
                 savingsAcc = findById(id);
-                if(savingsAcc.getPrimaryOwner().getId()==user.getId() || savingsAcc.getSecondaryOwner().getId() == user.getId()){
+                if(savingsAcc.getPrimaryOwner().getId().equals(user.getId()) || savingsAcc.getSecondaryOwner().getId().equals(user.getId())){
                     if(checkLoggedIn(user, savingsAcc))
                     {
                         return savingsAcc;

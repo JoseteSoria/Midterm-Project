@@ -21,7 +21,7 @@ public class TransactionService {
 
     public boolean checkTransaction(Transaction transaction) {
         //Admin movements are not taking into account
-        List<Transaction> transactions = transactionRepository.findByRoleIdNotLike("ADMIN");
+        List<Transaction> transactions = transactionRepository.findByRoleIdNotLikeAndNotOrderId("ADMIN", transaction.getOrderingId());
         Date lastTransaction = transactionRepository.findLastTransactionDate(transaction.getOrderingId());
         // if 2 transactions is done without 1 second of difference
         if(lastTransaction!=null && transaction.getDate().before(new Date(lastTransaction.getTime()+1000l))){
@@ -33,23 +33,23 @@ public class TransactionService {
         String trans24hBefore = simpleDateFormat.format((new Date(transaction.getDate().getTime() - 86400000l)));
         BigDecimal last24Amount = transactionRepository.findMyTotalLast24hTransactions(transDate,
                 trans24hBefore, transaction.getOrderingId()).orElse(new BigDecimal("0"));
-        BigDecimal totalWithThisTrans = last24Amount.add(transaction.getQuantity().getAmount());
+//        BigDecimal totalWithThisTrans = last24Amount.add(transaction.getQuantity().getAmount());
+        BigDecimal totalWithThisTrans = last24Amount.add(new BigDecimal("1"));
 
-        // Up to 300 every quantity is allowed. (For initialization)
-        BigDecimal maximum = new BigDecimal("300");
+        // Up to (2*1.5) = 3  transactions any day is allowed. (For initialization)
+        BigDecimal maximum = new BigDecimal("2");
 
         if (transactions!=null){
             for (Transaction trans : transactions) {
                 String date1 = simpleDateFormat.format(trans.getDate());
                 String date2 = simpleDateFormat.format(new Date(trans.getDate().getTime() - 86400000l));
-                BigDecimal max = transactionRepository.findMaxIn24HPeriodsForAnyOne(date1, date2);
+                BigDecimal max = transactionRepository.findMaxIn24HPeriodsForAnyOne(date1, date2, transaction.getOrderingId());
                 if (max.compareTo(maximum) > 0) {
                     maximum = max;
                 }
             }
         }
-        // bal + bal*1.5 = bal*2.5
-        if (totalWithThisTrans.compareTo(maximum.multiply(new BigDecimal("2.5"))) > 0)
+        if (totalWithThisTrans.compareTo(maximum.multiply(new BigDecimal("1.5"))) > 0)
         {
             return false;
         }

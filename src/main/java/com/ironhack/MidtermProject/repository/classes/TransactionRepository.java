@@ -13,17 +13,17 @@ import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction,Long> {
-    @Query(value = "select * from transaction t join user u on t.ordering_id = u.id where u.role != :role ;", nativeQuery = true)
-    public List<Transaction> findByRoleIdNotLike(@Param("role") String role);
+    @Query(value = "select * from transaction t join user u on t.ordering_id = u.id where u.role != :role and t.ordering_id != :orderId ;", nativeQuery = true)
+    public List<Transaction> findByRoleIdNotLikeAndNotOrderId(@Param("role") String role, @Param("orderId") Integer orderId);
 
     @Query(value = "select date from transaction where ordering_id =:orderId order by date desc limit 1;", nativeQuery = true)
     public Date findLastTransactionDate(@Param("orderId") Integer orderId);
 
-    @Query(value = "select max(tot) from (select sum(t.amount) as tot from transaction t join user u on t.ordering_id = u.id where" +
-            " u.role !='ADMIN' and t.date <= :date1 and t.date >= :date2 group by t.ordering_id) as a ;", nativeQuery = true)
-    public BigDecimal findMaxIn24HPeriodsForAnyOne(@Param("date1") String date1, @Param("date2") String date2);
+    @Query(value = "select max(tot) from (select count(t.amount) as tot from transaction t join user u on t.ordering_id = u.id where" +
+            " u.role !='ADMIN' and t.date <= :date1 and t.date >= :date2 and t.ordering_id != :orderId group by t.ordering_id) as a ;", nativeQuery = true)
+    public BigDecimal findMaxIn24HPeriodsForAnyOne(@Param("date1") String date1, @Param("date2") String date2, @Param("orderId") Integer orderId);
 
-    @Query(value = "select sum(t.amount) from transaction t join user u on t.ordering_id = " +
+    @Query(value = "select count(t.amount) from transaction t join user u on t.ordering_id = " +
             "u.id where t.date < :date1 and t.date > :date2 and u.role!='ADMIN' and t.ordering_id = :orderId ;", nativeQuery = true)
     public Optional<BigDecimal> findMyTotalLast24hTransactions(@Param("date1") String date1, @Param("date2") String date2, @Param("orderId") Integer orderId);
 

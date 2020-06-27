@@ -91,25 +91,6 @@ public class CreditCardAcc extends Account{
         this.dateInterestRate = dateInterestRate;
     }
 
-    public void updateDateInterestRate(){
-        // if more than a month
-        if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
-            // number of months
-            Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            BigDecimal monthlyInterestRate = (this.interestRate).divide(new BigDecimal("12"),4, RoundingMode.HALF_EVEN);
-            try{
-                for(int i = 0; i< months; i++){
-                    this.addBalance(new Money(this.balance.getAmount().multiply(monthlyInterestRate)));
-                }
-            }catch (NotEnoughMoneyException e){
-                this.balance = this.creditLimit;
-            }
-            finally{
-                setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(months*2629743000l)));
-            }
-        }
-    }
-
     @Override
     public void reduceBalance(Money balance){
         if (balance.getCurrency()!= this.balance.getCurrency()){
@@ -130,8 +111,25 @@ public class CreditCardAcc extends Account{
         if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){
             this.getBalance().increaseAmount(this.getPenaltyFee().getAmount());
         }
-
     }
 
+    public void updateDateInterestRate(){
+        // if more than a month
+        if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
+            // number of months
+            Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
+            BigDecimal monthlyInterestRate = (this.interestRate).divide(new BigDecimal("12"),4, RoundingMode.HALF_EVEN);
+            try{
+                for(int i = 0; i< months; i++){
+                    this.addBalance(new Money(this.balance.getAmount().multiply(monthlyInterestRate)));
+                }
+            }catch (NotEnoughMoneyException e){
+                this.balance = this.creditLimit;
+            }
+            finally{
+                setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(months*2629743000l)));
+            }
+        }
+    }
 
 }

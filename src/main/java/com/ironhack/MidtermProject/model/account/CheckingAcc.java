@@ -37,6 +37,7 @@ public class CheckingAcc extends Account{
     public CheckingAcc() {
         this.minimumBalance = new Money(new BigDecimal("250"));
         this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
+        this.dateMonthlyMaintenance = new Date();
     }
     /**Constructor without monthlyMaintenanceFee nor minimumBalance nor secret Key**/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
@@ -45,6 +46,7 @@ public class CheckingAcc extends Account{
         this.minimumBalance = new Money(new BigDecimal("250"));
         this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
         setStatus(status);
+        this.dateMonthlyMaintenance = new Date();
     }
 
     /**Constructor without secretKey**/
@@ -54,12 +56,13 @@ public class CheckingAcc extends Account{
         this.minimumBalance = minimumBalance;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
         setStatus(status);
+        this.dateMonthlyMaintenance = new Date();
     }
 
     /**Constructor with everything**/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
         super(primaryOwner, secondaryOwner, balance);
-        this.secretKey = secretKey;
+        setSecretKey(secretKey);
         this.minimumBalance = minimumBalance;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
         this.status = status;
@@ -87,17 +90,17 @@ public class CheckingAcc extends Account{
         return minimumBalance;
     }
 
-    public void setMinimumBalance(Money minimumBalance) {
-        this.minimumBalance = minimumBalance;
-    }
-
-    public Money getMonthlyMaintenanceFee() {
-        return monthlyMaintenanceFee;
-    }
-
-    public void setMonthlyMaintenanceFee(Money monthlyMaintenanceFee) {
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-    }
+//    public void setMinimumBalance(Money minimumBalance) {
+//        this.minimumBalance = minimumBalance;
+//    }
+//
+//    public Money getMonthlyMaintenanceFee() {
+//        return monthlyMaintenanceFee;
+//    }
+//
+//    public void setMonthlyMaintenanceFee(Money monthlyMaintenanceFee) {
+//        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
+//    }
 
     public Status getStatus() {
         return status;

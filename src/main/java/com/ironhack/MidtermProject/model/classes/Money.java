@@ -35,18 +35,18 @@ public class Money{
         this(amount, USD, DEFAULT_ROUNDING);
     }
 
-    public BigDecimal increaseAmount(Money money) {
-        setAmount(this.amount.add(money.amount));
-        return this.amount;
-    }
+//    public BigDecimal increaseAmount(Money money) {
+//        setAmount(this.amount.add(money.amount));
+//        return this.amount;
+//    }
     public BigDecimal increaseAmount(BigDecimal addAmount) {
         setAmount(this.amount.add(addAmount));
         return this.amount;
     }
-    public BigDecimal decreaseAmount(Money money) {
-        setAmount(this.amount.subtract(money.getAmount()));
-        return this.amount;
-    }
+//    public BigDecimal decreaseAmount(Money money) {
+//        setAmount(this.amount.subtract(money.getAmount()));
+//        return this.amount;
+//    }
     public BigDecimal decreaseAmount(BigDecimal addAmount) {
         setAmount(this.amount.subtract(addAmount));
         return this.amount;
@@ -60,7 +60,7 @@ public class Money{
     private void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-    public String toString() {
-        return getCurrency().getSymbol() + " " + getAmount();
-    }
+//    public String toString() {
+//        return getCurrency().getSymbol() + " " + getAmount();
+//    }
 }

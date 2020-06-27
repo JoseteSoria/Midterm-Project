@@ -136,7 +136,7 @@ public class AccountHolderService {
             studentCheckingAccRepository.save(senderStudentCheckingAcc);
         } else if (senderCreditCardAcc != null) {
             if (transactionAllowedSender) {
-                senderCreditCardAcc.reduceBalance(transaction.getQuantity());
+                senderCreditCardAcc.addBalance(transaction.getQuantity());
             } else {
                 throw new FraudException("You are committing fraud");
             }
@@ -177,7 +177,7 @@ public class AccountHolderService {
             receiverStudentCheckingAcc.addBalance(transaction.getQuantity());
             studentCheckingAccRepository.save(receiverStudentCheckingAcc);
         } else if (receiverCreditCardAcc != null) {
-            receiverCreditCardAcc.addBalance(transaction.getQuantity());
+            receiverCreditCardAcc.reduceBalance(transaction.getQuantity());
             creditCardAccRepository.save(receiverCreditCardAcc);
         } else if (receiverSavingsAcc != null) {
             if(receiverSavingsAcc.getStatus().equals(Status.FROZEN))
@@ -203,7 +203,12 @@ public class AccountHolderService {
         Account receiver = accountRepository.findById(receiverId).orElseThrow(()-> new IdNotFoundException("No receiver account found"));
         if(!user.getId().equals(sender.getPrimaryOwner().getId())&&!user.getId().equals(sender.getSecondaryOwner().getId()))
             throw new NoOwnerException("You are not the owner of this account");
-        Transaction transaction = new Transaction(user.getId(), sender, receiver, transferAmount, TransactionType.TRANSFERENCE);
+        else if(!(sender.getPrimaryOwner()!=null && (sender.getPrimaryOwner().getId().equals(user.getId())) && sender.getPrimaryOwner().isLoggedIn()) &&
+                !(sender.getSecondaryOwner()!=null && (sender.getSecondaryOwner().getId().equals(user.getId())) && sender.getSecondaryOwner().isLoggedIn()))
+        {
+            throw new StatusException("You are not logged in");
+        }
+        Transaction transaction = new Transaction(user.getId(), receiver, sender, transferAmount, TransactionType.TRANSFERENCE);
         boolean transAllowed = makeTransference(transaction);
         if(!transAllowed)
             throw new StatusException("Check accounts status. Something went wrong. Fraud?");

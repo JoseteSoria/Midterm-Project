@@ -21,6 +21,16 @@ public class CheckingAccCreation {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    public CheckingAccCreation(){}
+
+    public CheckingAccCreation(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
+        this.balance = balance;
+        this.status = Status.ACTIVE;
+        this.secretKey = generateKey();
+    }
+
     public String getType() {
         return type;
     }
@@ -59,6 +69,14 @@ public class CheckingAccCreation {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String generateKey(){
+        String str = "ES";
+        for(int i = 0; i<22; i++) {
+            str += String.valueOf((int)(Math.random()*10));
+        }
+        return str;
     }
 
     public Status getStatus() {

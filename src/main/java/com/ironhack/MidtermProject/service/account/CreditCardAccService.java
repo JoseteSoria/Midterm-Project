@@ -55,7 +55,7 @@ public class CreditCardAccService extends AccountService{
                 break;
             case ACCOUNT_HOLDER:
                 creditCardAcc = findById(id);
-                if(creditCardAcc.getPrimaryOwner().getId()==user.getId() || creditCardAcc.getSecondaryOwner().getId() == user.getId()){
+                if(creditCardAcc.getPrimaryOwner().getId().equals(user.getId()) || creditCardAcc.getSecondaryOwner().getId().equals(user.getId())){
                     if(checkLoggedIn(user, creditCardAcc))
                     {
                         return creditCardAcc;
@@ -140,7 +140,7 @@ public class CreditCardAccService extends AccountService{
             case ADMIN:
                 break;
             case ACCOUNT_HOLDER:
-                if((creditCardAcc.getPrimaryOwner()!=null && creditCardAcc.getPrimaryOwner().getId()== user.getId()) || (creditCardAcc.getSecondaryOwner()!=null && creditCardAcc.getSecondaryOwner().getId() == user.getId())){
+                if((creditCardAcc.getPrimaryOwner()!=null && creditCardAcc.getPrimaryOwner().getId().equals(user.getId())) || (creditCardAcc.getSecondaryOwner()!=null && creditCardAcc.getSecondaryOwner().getId().equals(user.getId()))){
                     if(checkLoggedIn(user, creditCardAcc))
                     {
                         break;

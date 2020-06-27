@@ -26,12 +26,12 @@ public class Transaction {
 
     public Transaction(){}
 
-    public Transaction(Integer orderingId, Money quantity, TransactionType transactionType) {
-        this.orderingId = orderingId;
-        this.quantity = quantity;
-        this.transactionType = transactionType;
-        this.date = new Date();
-    }
+//    public Transaction(Integer orderingId, Money quantity, TransactionType transactionType) {
+//        this.orderingId = orderingId;
+//        this.quantity = quantity;
+//        this.transactionType = transactionType;
+//        this.date = new Date();
+//    }
 
     public Transaction(Integer orderingId, Account beneficiaryAccount, Account senderAccount, Money quantity, TransactionType transactionType) {
         this.orderingId = orderingId;

@@ -4,6 +4,7 @@ import com.ironhack.MidtermProject.exceptions.CurrencyTypeException;
 import com.ironhack.MidtermProject.model.classes.Money;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Currency;
 
 public class Helpers {
@@ -15,7 +16,7 @@ public class Helpers {
             return toConvert;
         }
         else if(toConvert.getCurrency().getCurrencyCode().equals("USD") && reference.getCurrency().getCurrencyCode().equals("EUR")){
-            Money result = new Money(toConvert.getAmount().divide(new BigDecimal("1.12")).setScale(3),Currency.getInstance("EUR"));
+            Money result = new Money(toConvert.getAmount().divide(new BigDecimal("1.12"),3, RoundingMode.HALF_EVEN),Currency.getInstance("EUR"));
             return result;
         }
         else if(toConvert.getCurrency().getCurrencyCode().equals("EUR") && reference.getCurrency().getCurrencyCode().equals("USD")){

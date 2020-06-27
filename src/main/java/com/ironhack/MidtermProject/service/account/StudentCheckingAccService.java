@@ -50,7 +50,7 @@ public class StudentCheckingAccService extends AccountService{
                 break;
             case ACCOUNT_HOLDER:
                 studentCheckingAcc = findById(id);
-                if(studentCheckingAcc.getPrimaryOwner().getId()==user.getId() || studentCheckingAcc.getSecondaryOwner().getId() == user.getId()){
+                if(studentCheckingAcc.getPrimaryOwner().getId().equals(user.getId()) || studentCheckingAcc.getSecondaryOwner().getId().equals(user.getId())){
                     if(checkLoggedIn(user, studentCheckingAcc))
                     {
                         return studentCheckingAcc;

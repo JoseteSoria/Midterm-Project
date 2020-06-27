@@ -72,8 +72,8 @@ public abstract class Account {
     }
 
     public void setBalance(Money balance) {
-        if(this.balance == null) this.balance = new Money(new BigDecimal("0"));
-        this.balance = balance;
+        if(balance == null) this.balance = new Money(new BigDecimal("0"));
+        else this.balance = balance;
     }
 
     public void setOwners(AccountHolder primaryOwner, AccountHolder secondaryOwner){

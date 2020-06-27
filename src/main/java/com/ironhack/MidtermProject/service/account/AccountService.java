@@ -36,8 +36,8 @@ public class AccountService {
     }
 
     public boolean checkLoggedIn(User user, Account account){
-        if((account.getPrimaryOwner()!=null && (account.getPrimaryOwner().getId() == user.getId()) && account.getPrimaryOwner().isLoggedIn()) ||
-                (account.getSecondaryOwner()!=null && (account.getSecondaryOwner().getId()== user.getId()) && account.getSecondaryOwner().isLoggedIn()))
+        if((account.getPrimaryOwner()!=null && (account.getPrimaryOwner().getId().equals(user.getId())) && account.getPrimaryOwner().isLoggedIn()) ||
+                (account.getSecondaryOwner()!=null && (account.getSecondaryOwner().getId().equals(user.getId())) && account.getSecondaryOwner().isLoggedIn()))
         {
             return true;
         }else
@@ -45,17 +45,18 @@ public class AccountService {
     }
 
     public void checkAllowance(User user, Integer id, String secretKey, String header) {
-        Account account = findById(id);
+        Account account = accountRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Account not found with that id"));;
         switch(user.getRole()){
             case ADMIN:
                 break;
             case ACCOUNT_HOLDER:
-                if((account.getPrimaryOwner()!=null && account.getPrimaryOwner().getId()== user.getId()) || (account.getSecondaryOwner()!=null && account.getSecondaryOwner().getId() == user.getId())){
+                if((account.getPrimaryOwner()!=null && account.getPrimaryOwner().getId().equals(user.getId())) || (account.getSecondaryOwner()!=null && account.getSecondaryOwner().getId().equals(user.getId()))){
                     if(checkLoggedIn(user, account)) {
                         break;
                     }
-                    else
+                    else {
                         throw new StatusException("You are not logged in");
+                    }
                 }
                 else throw new NoOwnerException("You are not the owner of this account");
             case THIRD_PARTY:
@@ -82,10 +83,10 @@ public class AccountService {
                         new AccountHolder(account.getPrimaryOwner().getName(), account.getPrimaryOwner().getUsername(),
                                 account.getPrimaryOwner().getPassword(), account.getPrimaryOwner().getDateOfBirthday(),
                                 account.getPrimaryOwner().getPrimaryAddress(), account.getPrimaryOwner().getMailingAddress()));
-            } else {
-                primOwner = new AccountHolder(account.getPrimaryOwner().getName(), account.getPrimaryOwner().getUsername(),
-                        account.getPrimaryOwner().getPassword(), account.getPrimaryOwner().getDateOfBirthday(),
-                        account.getPrimaryOwner().getPrimaryAddress(), account.getPrimaryOwner().getMailingAddress());
+            }
+            else{
+                // Theoretically not reachable thankfully the constructor of tha accountHolder
+                throw new NoOwnerException("You have to provide at least id or username for primary owner");
             }
         }
         else{
@@ -93,8 +94,8 @@ public class AccountService {
             throw new NoOwnerException("You have to provide a primary owner");
         }
         accountHolders[0] = primOwner;
-        AccountHolder secOwner;
         if(account.getSecondaryOwner()!=null) {
+            AccountHolder secOwner;
             if (account.getSecondaryOwner().getId() != null) {
                 secOwner = accountHolderRepository.findById(account.getSecondaryOwner().getId())
                         .orElseThrow(() -> new IdNotFoundException("Not secondary Owner found with that id"));
@@ -103,10 +104,10 @@ public class AccountService {
                         new AccountHolder(account.getSecondaryOwner().getName(), account.getSecondaryOwner().getUsername(),
                                 account.getSecondaryOwner().getPassword(), account.getSecondaryOwner().getDateOfBirthday(),
                                 account.getSecondaryOwner().getPrimaryAddress(), account.getSecondaryOwner().getMailingAddress()));
-            } else {
-                secOwner = new AccountHolder(account.getSecondaryOwner().getName(), account.getSecondaryOwner().getUsername(),
-                        account.getSecondaryOwner().getPassword(), account.getSecondaryOwner().getDateOfBirthday(),
-                        account.getSecondaryOwner().getPrimaryAddress(), account.getSecondaryOwner().getMailingAddress());
+            }
+            else {
+                // Theoretically not reachable thankfully the constructor of tha accountHolder
+                throw new NoOwnerException("You have to provide at least id or username for secondary owner");
             }
             accountHolders[1] = secOwner;
         }

@@ -10,6 +10,14 @@ public class Address {
     private String city;
     private String street;
 
+    public Address() {}
+
+    public Address(String country, String city, String street) {
+        setCountry(country);
+        setCity(city);
+        setStreet(street);
+    }
+
     public String getCountry() {
         return country;
     }

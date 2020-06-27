@@ -1,5 +1,6 @@
 package com.ironhack.MidtermProject.controller.impl.account;
 
+import com.ironhack.MidtermProject.controller.interfaces.account.AccountController;
 import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.user.User;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class AccountControllerImpl {
+public class AccountControllerImpl implements AccountController {
     @Autowired
     private AccountService accountService;
 

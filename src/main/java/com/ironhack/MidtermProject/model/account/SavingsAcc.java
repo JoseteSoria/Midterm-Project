@@ -38,7 +38,7 @@ public class SavingsAcc extends Account{
     /**Constructor without interestRate nor minimumBalance or secretKey**/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
-        this.secretKey = getSecretKey();
+        this.secretKey = generateKey();
         this.minimumBalance = new Money(new BigDecimal("1000"));
         this.interestRate = new BigDecimal("0.0025");
         this.status = status;
@@ -58,7 +58,7 @@ public class SavingsAcc extends Account{
     /**Constructor with everything**/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, BigDecimal interestRate, Status status) {
         super(primaryOwner, secondaryOwner, balance);
-        this.secretKey = secretKey;
+        setSecretKey(secretKey);
         setMinimumBalance(minimumBalance);
         setInterestRate(interestRate);
         setStatus(status);

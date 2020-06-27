@@ -46,9 +46,9 @@ public class AccountHolder extends User{
 
     public AccountHolder(String name, String username, String password, Date dateOfBirthday, Address primaryAddress, Address mailingAddress) {
         super(name, username, password, Role.ACCOUNT_HOLDER);
-        this.dateOfBirthday = dateOfBirthday;
-        this.primaryAddress = primaryAddress;
-        this.mailingAddress = mailingAddress;
+        setDateOfBirthday(dateOfBirthday);
+        setPrimaryAddress(primaryAddress);
+        setMailingAddress(mailingAddress);
         this.loggedIn = false;
     }
 

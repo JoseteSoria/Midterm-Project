@@ -72,4 +72,5 @@ class AdminControllerImplTest {
                 .andReturn().getResponse().getContentAsString().contains("Amazon");
     }
 
+
 }

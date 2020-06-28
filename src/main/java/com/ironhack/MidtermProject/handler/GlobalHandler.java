@@ -25,10 +25,10 @@ public class GlobalHandler {
         response.sendError(HttpServletResponse.SC_NOT_FOUND, noSuchOpportunityException.getMessage());
     }
 
-    @ExceptionHandler(NoHeaderException.class)
-    public void noHeaderExceptionHandler(NoHeaderException opportunityAlreadyClosedException, HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, opportunityAlreadyClosedException.getMessage());
-    }
+//    @ExceptionHandler(NoHeaderException.class)
+//    public void noHeaderExceptionHandler(NoHeaderException opportunityAlreadyClosedException, HttpServletResponse response) throws IOException {
+//        response.sendError(HttpServletResponse.SC_BAD_REQUEST, opportunityAlreadyClosedException.getMessage());
+//    }
 
     @ExceptionHandler(NoOwnerException.class)
     public void noOwnerExceptionHandler(NoOwnerException e, HttpServletResponse response) throws IOException {
@@ -45,6 +45,9 @@ public class GlobalHandler {
         response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, e.getMessage());
     }
 
+    // We can not test the status of the response due to we do not have any query to create a user
+    // We create the users from (account-holders, admins or third-parties). It´s only write in the program
+    // if anytime anyone will want to change this.
     @ExceptionHandler(UserAlreadyExistException.class)
     public void userAlreadyExistExceptionHandler(UserAlreadyExistException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());

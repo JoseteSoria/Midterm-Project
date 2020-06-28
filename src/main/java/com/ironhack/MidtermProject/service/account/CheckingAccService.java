@@ -57,11 +57,13 @@ public class CheckingAccService extends AccountService {
         switch (user.getRole()) {
             case ADMIN:
                 checkingAcc = findById(id);
+                LOGGER.info("ACCESS TO CHECKING ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                 break;
             case ACCOUNT_HOLDER:
                 checkingAcc = findById(id);
                 if ((checkingAcc.getPrimaryOwner() != null && checkingAcc.getPrimaryOwner().getId().equals(user.getId())) || (checkingAcc.getSecondaryOwner() != null && checkingAcc.getSecondaryOwner().getId().equals(user.getId()))) {
                     if (checkLoggedIn(user, checkingAcc)) {
+                        LOGGER.info("ACCESS TO CHECKING ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                         return checkingAcc;
                     } else
                         throw new StatusException("You are not logged in");

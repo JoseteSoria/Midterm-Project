@@ -48,11 +48,13 @@ public class SavingsAccService extends AccountService {
         switch (user.getRole()) {
             case ADMIN:
                 savingsAcc = findById(id);
+                LOGGER.info("ACCESS TO SAVINGS ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                 break;
             case ACCOUNT_HOLDER:
                 savingsAcc = findById(id);
                 if (savingsAcc.getPrimaryOwner().getId().equals(user.getId()) || savingsAcc.getSecondaryOwner().getId().equals(user.getId())) {
                     if (checkLoggedIn(user, savingsAcc)) {
+                        LOGGER.info("ACCESS TO SAVINGS ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                         return savingsAcc;
                     } else
                         throw new StatusException("You are not logged in");

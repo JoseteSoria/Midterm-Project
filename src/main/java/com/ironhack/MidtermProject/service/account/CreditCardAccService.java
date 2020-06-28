@@ -47,11 +47,13 @@ public class CreditCardAccService extends AccountService {
         switch (user.getRole()) {
             case ADMIN:
                 creditCardAcc = findById(id);
+                LOGGER.info("ACCESS TO CREDIT-CARD ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                 break;
             case ACCOUNT_HOLDER:
                 creditCardAcc = findById(id);
                 if (creditCardAcc.getPrimaryOwner().getId().equals(user.getId()) || creditCardAcc.getSecondaryOwner().getId().equals(user.getId())) {
                     if (checkLoggedIn(user, creditCardAcc)) {
+                        LOGGER.info("ACCESS TO CREDIT-CARD ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                         return creditCardAcc;
                     } else
                         throw new StatusException("You are not logged in");

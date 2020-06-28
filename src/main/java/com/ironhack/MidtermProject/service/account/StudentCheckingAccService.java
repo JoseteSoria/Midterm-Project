@@ -44,11 +44,13 @@ public class StudentCheckingAccService extends AccountService {
         switch (user.getRole()) {
             case ADMIN:
                 studentCheckingAcc = findById(id);
+                LOGGER.info("ACCESS TO STUDENT-CHECKING ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                 break;
             case ACCOUNT_HOLDER:
                 studentCheckingAcc = findById(id);
                 if (studentCheckingAcc.getPrimaryOwner().getId().equals(user.getId()) || studentCheckingAcc.getSecondaryOwner().getId().equals(user.getId())) {
                     if (checkLoggedIn(user, studentCheckingAcc)) {
+                        LOGGER.info("ACCESS TO STUDENT-CHECKING ACCOUNT" + id + " . USER ORDER-ID : " + user.getId());
                         return studentCheckingAcc;
                     } else
                         throw new StatusException("You are not logged in");

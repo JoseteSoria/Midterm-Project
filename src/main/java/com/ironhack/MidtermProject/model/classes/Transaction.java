@@ -2,8 +2,6 @@ package com.ironhack.MidtermProject.model.classes;
 
 import com.ironhack.MidtermProject.enums.TransactionType;
 import com.ironhack.MidtermProject.model.account.Account;
-import com.ironhack.MidtermProject.model.user.AccountHolder;
-import org.springframework.transaction.TransactionSuspensionNotSupportedException;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,21 +22,15 @@ public class Transaction {
     private TransactionType transactionType;
     private Date date;
 
-    public Transaction(){}
-
-//    public Transaction(Integer orderingId, Money quantity, TransactionType transactionType) {
-//        this.orderingId = orderingId;
-//        this.quantity = quantity;
-//        this.transactionType = transactionType;
-//        this.date = new Date();
-//    }
+    public Transaction() {
+    }
 
     public Transaction(Integer orderingId, Account beneficiaryAccount, Account senderAccount, Money quantity, TransactionType transactionType) {
-        this.orderingId = orderingId;
-        this.beneficiaryAccount = beneficiaryAccount;
-        this.senderAccount = senderAccount;
-        this.quantity = quantity;
-        this.transactionType = transactionType;
+        setOrderingId(orderingId);
+        setBeneficiaryAccount(beneficiaryAccount);
+        setSenderAccount(senderAccount);
+        setQuantity(quantity);
+        setTransactionType(transactionType);
         this.date = new Date();
     }
 

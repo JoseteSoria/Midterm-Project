@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction,Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     @Query(value = "select * from transaction t join user u on t.ordering_id = u.id where u.role != :role and t.ordering_id != :orderId ;", nativeQuery = true)
     public List<Transaction> findByRoleIdNotLikeAndNotOrderId(@Param("role") String role, @Param("orderId") Integer orderId);
 

@@ -32,7 +32,6 @@ import java.sql.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -80,16 +79,16 @@ class CheckingAccControllerImplTest {
         ah1 = new AccountHolder("Simba", "kinglyon", "kinglyon", d1, add1, null);
         ah2 = new AccountHolder("Hercules", "strongman", "strongman", d2, add1, null);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         party1 = new ThirdParty("Third", "third", "third", "third-hashkey");
         accountHolderRepository.saveAll(Stream.of(ah1, ah2, ah3).collect(Collectors.toList()));
         adminRepository.save(admin1);
         thirdPartyRepository.save(party1);
-        ac1 = new CheckingAcc(ah1,ah2,new Money(new BigDecimal("5000")), Status.ACTIVE);
+        ac1 = new CheckingAcc(ah1, ah2, new Money(new BigDecimal("5000")), Status.ACTIVE);
         ac1.setSecretKey("secretkey");
-        ac2 = new CheckingAcc(ah1,ah3,new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac2 = new CheckingAcc(ah1, ah3, new Money(new BigDecimal("1000")), Status.ACTIVE);
         checkingAccRepository.saveAll(Stream.of(ac1, ac2).collect(Collectors.toList()));
-        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks","dreamworks"));
+        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks", "dreamworks"));
         cu2 = new CustomSecurityUser(new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null));
         cu3 = new CustomSecurityUser(new ThirdParty("Third", "third", "third", "third-hashkey"));
         cu3.setId(party1.getId());
@@ -119,17 +118,17 @@ class CheckingAccControllerImplTest {
 
     @Test
     void addBalance() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/credit?amount="  + String.valueOf(100)).with(user(cu1))).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/credit?amount=" + String.valueOf(100)).with(user(cu1))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void reduceBalance() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount="  + String.valueOf(100)).with(user(cu1))).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount=" + String.valueOf(100)).with(user(cu1))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void store() throws Exception {
-        CheckingAcc ac3 = new CheckingAcc(ah2,ah3,new Money(new BigDecimal("7000")), Status.ACTIVE);
+        CheckingAcc ac3 = new CheckingAcc(ah2, ah3, new Money(new BigDecimal("7000")), Status.ACTIVE);
         mockMvc.perform(post("/checking-accounts").with(user(cu1)).content(objectMapper.writeValueAsString(ac3))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString().contains("7000");
@@ -137,33 +136,33 @@ class CheckingAccControllerImplTest {
 
     @Test
     void changeStatus() throws Exception {
-        mockMvc.perform(put("/checking-accounts/"+ ac1.getId() +"/set-status/FROZEN").with(user(cu1))).andExpect(status().isNoContent())
+        mockMvc.perform(put("/checking-accounts/" + ac1.getId() + "/set-status/FROZEN").with(user(cu1))).andExpect(status().isNoContent())
                 .andReturn().getResponse().getContentAsString().contains("FROZEN");
     }
 
     @Test
     void changeStatus_AlreadyActive_NotAcceptable() throws Exception {
-        mockMvc.perform(put("/checking-accounts/"+ ac1.getId() +"/set-status/ACTIVE").with(user(cu1))).andExpect(status().isNotAcceptable());
+        mockMvc.perform(put("/checking-accounts/" + ac1.getId() + "/set-status/ACTIVE").with(user(cu1))).andExpect(status().isNotAcceptable());
     }
 
     @Test
     void reduceBalance_NotEnoughMoney() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount="  + String.valueOf(100000)).with(user(cu1))).andExpect(status().isNotAcceptable());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount=" + String.valueOf(100000)).with(user(cu1))).andExpect(status().isNotAcceptable());
     }
 
     @Test
     void reduceBalance_NoOwner() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount="  + String.valueOf(1000)).with(user(cu2))).andExpect(status().isNotFound());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount=" + String.valueOf(1000)).with(user(cu2))).andExpect(status().isNotFound());
     }
 
     @Test
     void findById_NotFoundId() throws Exception {
-        mockMvc.perform(get("/checking-accounts/" + String.valueOf(ac2.getId()+1000)).with(user(cu1))).andExpect(status().isNotFound());
+        mockMvc.perform(get("/checking-accounts/" + String.valueOf(ac2.getId() + 1000)).with(user(cu1))).andExpect(status().isNotFound());
     }
 
     @Test
     void reduceBalance_NoCurrencyAllowed() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount="  + String.valueOf(1000) +"&currency=ISR").with(user(cu2))).andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount=" + String.valueOf(1000) + "&currency=ISR").with(user(cu2))).andExpect(status().isBadRequest());
     }
 
 }

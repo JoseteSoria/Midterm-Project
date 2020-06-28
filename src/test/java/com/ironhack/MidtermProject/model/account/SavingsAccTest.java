@@ -28,41 +28,41 @@ class SavingsAccTest {
         ah1 = new AccountHolder("Juan", "juanito", "juanito", d1, add1, null);
         ah2 = new AccountHolder("Pedro", "pedrito", "pedrito", d2, add1, null);
         ac3 = new SavingsAcc();
-        ac1 = new SavingsAcc(ah1,ah2,new Money(new BigDecimal("10000")), Status.ACTIVE);
-        ac2 = new SavingsAcc(ah1,ah2,new Money(new BigDecimal("30000")), new Money(new BigDecimal("1000")), new BigDecimal("0.5"), Status.FROZEN);
-        ac4 = new SavingsAcc(ah1,ah2,new Money(new BigDecimal("40000")), "AS2382739232194", new Money(new BigDecimal("1000")), new BigDecimal("0.5"), Status.FROZEN);
+        ac1 = new SavingsAcc(ah1, ah2, new Money(new BigDecimal("10000")), Status.ACTIVE);
+        ac2 = new SavingsAcc(ah1, ah2, new Money(new BigDecimal("30000")), new Money(new BigDecimal("1000")), new BigDecimal("0.5"), Status.FROZEN);
+        ac4 = new SavingsAcc(ah1, ah2, new Money(new BigDecimal("40000")), "AS2382739232194", new Money(new BigDecimal("1000")), new BigDecimal("0.5"), Status.FROZEN);
     }
 
     @Test
-    void generateKey_WellDone(){
+    void generateKey_WellDone() {
         assertTrue(ac1.getSecretKey().contains("ES"));
     }
 
     @Test
-    void setStatus_NullStatus_Active(){
+    void setStatus_NullStatus_Active() {
         ac2.setStatus(null);
         assertEquals(Status.ACTIVE, ac2.getStatus());
     }
 
     @Test
-    void reduceBalance_BelowMinimumBalance_Exception(){
+    void reduceBalance_BelowMinimumBalance_Exception() {
         ac1.reduceBalance(new Money(new BigDecimal("9200")));
-        assertThrows(NotEnoughMoneyException.class, ()-> ac1.reduceBalance(new Money(new BigDecimal(100))));
+        assertThrows(NotEnoughMoneyException.class, () -> ac1.reduceBalance(new Money(new BigDecimal(100))));
     }
 
     @Test
-    void reduceBalance_NotEnoughAmount_Exception(){
-        assertThrows(NotEnoughMoneyException.class, ()-> ac1.reduceBalance(new Money(new BigDecimal(20000))));
+    void reduceBalance_NotEnoughAmount_Exception() {
+        assertThrows(NotEnoughMoneyException.class, () -> ac1.reduceBalance(new Money(new BigDecimal(20000))));
     }
 
     @Test
-    void setMinimumBalance_Null_1000(){
+    void setMinimumBalance_Null_1000() {
         ac1.setMinimumBalance(null);
         assertEquals(new BigDecimal("1000.00"), ac1.getMinimumBalance().getAmount());
     }
 
     @Test
-    void setMinimumBalance_OverLimits_Correct(){
+    void setMinimumBalance_OverLimits_Correct() {
         ac1.setMinimumBalance(new Money(new BigDecimal("2000")));
         assertEquals(new BigDecimal("1000.00"), ac1.getMinimumBalance().getAmount());
         ac1.setMinimumBalance(new Money(new BigDecimal("50")));
@@ -70,13 +70,13 @@ class SavingsAccTest {
     }
 
     @Test
-    void setInterestRate_Null_00025(){
+    void setInterestRate_Null_00025() {
         ac1.setInterestRate(null);
         assertEquals(new BigDecimal("0.0025"), ac1.getInterestRate());
     }
 
     @Test
-    void setInterestRate_OverLimits_Correct(){
+    void setInterestRate_OverLimits_Correct() {
         ac1.setInterestRate(new BigDecimal("0.6"));
         assertEquals(new BigDecimal("0.5"), ac1.getInterestRate());
         ac1.setInterestRate(new BigDecimal("0.002"));
@@ -84,13 +84,13 @@ class SavingsAccTest {
     }
 
     @Test
-    void updateDateInterestRate_ChangeDate(){
+    void updateDateInterestRate_ChangeDate() {
         ac1.setInterestRate(new BigDecimal("0.3"));
         ac1.setDateInterestRate(Date.valueOf("2010-04-20"));
         BigDecimal originalMoney = ac1.getBalance().getAmount();
         ac1.updateDateInterestRate();
         assertTrue(ac1.getDateInterestRate().after(Date.valueOf("2010-04-20")));
-        assertTrue(ac1.getBalance().getAmount().compareTo(originalMoney)>0);
+        assertTrue(ac1.getBalance().getAmount().compareTo(originalMoney) > 0);
     }
 
 

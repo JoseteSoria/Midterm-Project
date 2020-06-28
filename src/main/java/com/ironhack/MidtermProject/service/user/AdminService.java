@@ -14,7 +14,9 @@ public class AdminService {
     @Autowired
     private AdminRepository adminRepository;
 
-    public List<Admin> findAll(){ return adminRepository.findAll(); }
+    public List<Admin> findAll() {
+        return adminRepository.findAll();
+    }
 
     public Admin create(Admin admin) {
         Admin ad1 = new Admin(admin.getName(), admin.getUsername(), admin.getPassword());

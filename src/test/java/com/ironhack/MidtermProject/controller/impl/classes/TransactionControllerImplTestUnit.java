@@ -9,14 +9,7 @@ import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.classes.Transaction;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 import com.ironhack.MidtermProject.model.user.Admin;
-import com.ironhack.MidtermProject.repository.account.AccountRepository;
-import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
-import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
-import com.ironhack.MidtermProject.repository.user.AdminRepository;
-import com.ironhack.MidtermProject.security.CustomSecurityUser;
-import com.ironhack.MidtermProject.service.account.AccountService;
 import com.ironhack.MidtermProject.service.classes.TransactionService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +24,7 @@ import java.sql.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,13 +56,13 @@ class TransactionControllerImplTestUnit {
         ah1 = new AccountHolder("Simba", "kinglyon", "kinglyon", d1, add1, null);
         ah2 = new AccountHolder("Hercules", "strongman", "strongman", d2, add1, null);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
-        ac1 = new StudentCheckingAcc(ah1,ah2,new Money(new BigDecimal("1000")), Status.ACTIVE);
-        ac2 = new StudentCheckingAcc(ah3,null,new Money(new BigDecimal("3000")), Status.ACTIVE);
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
+        ac1 = new StudentCheckingAcc(ah1, ah2, new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac2 = new StudentCheckingAcc(ah3, null, new Money(new BigDecimal("3000")), Status.ACTIVE);
         t2 = new Transaction();
         t1 = new Transaction(ah1.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        when(transactionService.findAll()).thenReturn(Stream.of(t1,t2).collect(Collectors.toList()));
-  }
+        when(transactionService.findAll()).thenReturn(Stream.of(t1, t2).collect(Collectors.toList()));
+    }
 
     @Test
     void findAll() throws Exception {

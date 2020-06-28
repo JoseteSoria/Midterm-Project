@@ -13,15 +13,12 @@ import java.util.Date;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
-public class CreditCardAcc extends Account{
+public class CreditCardAcc extends Account {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "creditLimit_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "creditLimit_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "creditLimit_currency")),
     })
     private Money creditLimit;
     private BigDecimal interestRate;
@@ -33,7 +30,9 @@ public class CreditCardAcc extends Account{
         this.interestRate = new BigDecimal("0.2");
     }
 
-    /**Constructor without creditLimit nor interestRate or dateInterestRate**/
+    /**
+     * Constructor without creditLimit nor interestRate or dateInterestRate
+     **/
     public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner) {
         super(primaryOwner, secondaryOwner, new Money(new BigDecimal("0")));
         this.creditLimit = new Money(new BigDecimal("100"));
@@ -41,7 +40,9 @@ public class CreditCardAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-    /**Constructor with everything**/
+    /**
+     * Constructor with everything
+     **/
     public CreditCardAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money creditLimit, BigDecimal interestRate) {
         super(primaryOwner, secondaryOwner, new Money(new BigDecimal("0")));
         setCreditLimit(creditLimit);
@@ -54,14 +55,13 @@ public class CreditCardAcc extends Account{
     }
 
     public void setCreditLimit(Money creditLimit) {
-        if(creditLimit == null){
+        if (creditLimit == null) {
             this.creditLimit = new Money(new BigDecimal("100"));
-        }
-        else if(creditLimit.getAmount().compareTo(new BigDecimal("100000"))>=0) {
+        } else if (creditLimit.getAmount().compareTo(new BigDecimal("100000")) >= 0) {
             this.creditLimit = new Money(new BigDecimal("100000"));
-        }else if(creditLimit.getAmount().compareTo(new BigDecimal("100"))<=0) {
+        } else if (creditLimit.getAmount().compareTo(new BigDecimal("100")) <= 0) {
             this.creditLimit = new Money(new BigDecimal("100"));
-        }else {
+        } else {
             this.creditLimit = creditLimit;
         }
     }
@@ -71,14 +71,13 @@ public class CreditCardAcc extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        if(interestRate == null){
+        if (interestRate == null) {
             this.interestRate = new BigDecimal("0.2");
-        }
-        else if(interestRate.compareTo(new BigDecimal("0.2"))>=0) {
+        } else if (interestRate.compareTo(new BigDecimal("0.2")) >= 0) {
             this.interestRate = new BigDecimal("0.2");
-        }else if(interestRate.compareTo(new BigDecimal("0.1"))<=0) {
+        } else if (interestRate.compareTo(new BigDecimal("0.1")) <= 0) {
             this.interestRate = new BigDecimal("0.1");
-        }else {
+        } else {
             this.interestRate = interestRate;
         }
     }
@@ -92,42 +91,41 @@ public class CreditCardAcc extends Account{
     }
 
     @Override
-    public void reduceBalance(Money balance){
-        if (balance.getCurrency()!= this.balance.getCurrency()){
+    public void reduceBalance(Money balance) {
+        if (balance.getCurrency() != this.balance.getCurrency()) {
             balance = Helpers.convertMoney(balance, this.balance);
         }
         this.balance.decreaseAmount(balance.getAmount());
     }
 
     @Override
-    public void addBalance(Money balance){
-        if (balance.getCurrency()!= this.balance.getCurrency()){
+    public void addBalance(Money balance) {
+        if (balance.getCurrency() != this.balance.getCurrency()) {
             balance = Helpers.convertMoney(balance, this.balance);
         }
-        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>=0){
+        if (this.balance.getAmount().compareTo(creditLimit.getAmount()) >= 0) {
             throw new NotEnoughMoneyException("Your balance has reach the credit limit.");
         }
         this.balance.increaseAmount(balance.getAmount());
-        if(this.balance.getAmount().compareTo(creditLimit.getAmount())>0){
+        if (this.balance.getAmount().compareTo(creditLimit.getAmount()) > 0) {
             this.getBalance().increaseAmount(this.getPenaltyFee().getAmount());
         }
     }
 
-    public void updateDateInterestRate(){
+    public void updateDateInterestRate() {
         // if more than a month
-        if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-2629743000l ))) {
+        if (this.dateInterestRate.before(new Date(System.currentTimeMillis() - 2629743000l))) {
             // number of months
-            Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/2629743000l));
-            BigDecimal monthlyInterestRate = (this.interestRate).divide(new BigDecimal("12"),4, RoundingMode.HALF_EVEN);
-            try{
-                for(int i = 0; i< months; i++){
+            Integer months = Integer.valueOf((int) ((System.currentTimeMillis() - this.dateInterestRate.getTime()) / 2629743000l));
+            BigDecimal monthlyInterestRate = (this.interestRate).divide(new BigDecimal("12"), 4, RoundingMode.HALF_EVEN);
+            try {
+                for (int i = 0; i < months; i++) {
                     this.addBalance(new Money(this.balance.getAmount().multiply(monthlyInterestRate)));
                 }
-            }catch (NotEnoughMoneyException e){
+            } catch (NotEnoughMoneyException e) {
                 this.balance = this.creditLimit;
-            }
-            finally{
-                setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(months*2629743000l)));
+            } finally {
+                setDateInterestRate(new Date(this.getDateInterestRate().getTime() + (months * 2629743000l)));
             }
         }
     }

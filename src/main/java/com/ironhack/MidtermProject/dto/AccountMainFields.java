@@ -7,7 +7,9 @@ public class AccountMainFields {
     private String ownerName;
     private Money balance;
 
-    public AccountMainFields(){}
+    public AccountMainFields() {
+    }
+
     public AccountMainFields(Integer id, String ownerName, Money balance) {
         setId(id);
         setOwnerName(ownerName);

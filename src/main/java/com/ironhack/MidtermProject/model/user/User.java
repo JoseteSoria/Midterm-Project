@@ -1,6 +1,5 @@
 package com.ironhack.MidtermProject.model.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ironhack.MidtermProject.enums.Role;
 import com.ironhack.MidtermProject.util.PasswordUtility;
 
@@ -26,7 +25,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     protected Role role;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String name, String username, String password, Role role) {
         this.name = name;

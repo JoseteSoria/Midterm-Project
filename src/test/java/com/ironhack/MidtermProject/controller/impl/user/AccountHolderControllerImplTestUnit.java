@@ -3,21 +3,13 @@ package com.ironhack.MidtermProject.controller.impl.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ironhack.MidtermProject.dto.AccountMainFields;
 import com.ironhack.MidtermProject.enums.Status;
-import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Address;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 import com.ironhack.MidtermProject.model.user.Admin;
 import com.ironhack.MidtermProject.model.user.ThirdParty;
-import com.ironhack.MidtermProject.repository.account.*;
-import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
-import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
-import com.ironhack.MidtermProject.repository.user.AdminRepository;
-import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
-import com.ironhack.MidtermProject.security.CustomSecurityUser;
 import com.ironhack.MidtermProject.service.user.AccountHolderService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +26,9 @@ import java.sql.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -75,21 +62,25 @@ class AccountHolderControllerImplTestUnit {
         ah2.setId(2);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
         ah3.setId(3);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         party1 = new ThirdParty("Third", "third", "third", "third-hashkey");
-        ac1 = new CheckingAcc(ah1,ah2,new Money(new BigDecimal("5000")), Status.ACTIVE);
+        ac1 = new CheckingAcc(ah1, ah2, new Money(new BigDecimal("5000")), Status.ACTIVE);
         ac1.setId(1);
-        ac2 = new CheckingAcc(ah1,ah3,new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac2 = new CheckingAcc(ah1, ah3, new Money(new BigDecimal("1000")), Status.ACTIVE);
         ac2.setId(2);
-        when(accountHolderService.findAll()).thenReturn(Stream.of(ah1,ah2,ah3).collect(Collectors.toList()));
+        when(accountHolderService.findAll()).thenReturn(Stream.of(ah1, ah2, ah3).collect(Collectors.toList()));
         when(accountHolderService.checkFindById(1, ah1)).thenReturn(ah1);
         AccountMainFields af1 = new AccountMainFields(ac1.getId(), ah1.getName(), ac1.getBalance());
         AccountMainFields af2 = new AccountMainFields(ac2.getId(), ah1.getName(), ac2.getBalance());
-        when(accountHolderService.findAllAccountAsPrimaryOwnerById(1, ah1)).thenReturn(Stream.of(af1,af2).collect(Collectors.toList()));
+        when(accountHolderService.findAllAccountAsPrimaryOwnerById(1, ah1)).thenReturn(Stream.of(af1, af2).collect(Collectors.toList()));
         AccountHolder ah4 = new AccountHolder("Cinderella", "cinderella", "cinderella", d1, add1, null);
         when(accountHolderService.store(ah4)).thenReturn(ah4);
-        doAnswer(i->{return null;}).when(accountHolderService).setLogged(ah1,false);
-        doAnswer(i->{return null;}).when(accountHolderService).prepareTransference(ah1,ac2.getId(),ac1.getId(),new BigDecimal("100"),null);
+        doAnswer(i -> {
+            return null;
+        }).when(accountHolderService).setLogged(ah1, false);
+        doAnswer(i -> {
+            return null;
+        }).when(accountHolderService).prepareTransference(ah1, ac2.getId(), ac1.getId(), new BigDecimal("100"), null);
     }
 
     @Test
@@ -125,8 +116,8 @@ class AccountHolderControllerImplTestUnit {
     }
 
     @Test
-    void transference() throws Exception{
-        mockMvc.perform(post("/account-holders/transference/" + ac1.getId() + "?receiver-account-id="+ ac2.getId() + "&amount=400")).andExpect(status().is2xxSuccessful());
+    void transference() throws Exception {
+        mockMvc.perform(post("/account-holders/transference/" + ac1.getId() + "?receiver-account-id=" + ac2.getId() + "&amount=400")).andExpect(status().is2xxSuccessful());
     }
 
 }

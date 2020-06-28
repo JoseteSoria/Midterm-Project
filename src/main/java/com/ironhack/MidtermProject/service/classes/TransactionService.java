@@ -7,16 +7,22 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 @Service
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public List<Transaction> findAll(){ return transactionRepository.findAll(); }
+    public List<Transaction> findAll() {
+        return transactionRepository.findAll();
+    }
 
-    public void create(Transaction transaction){ transactionRepository.save(transaction); }
+    public void create(Transaction transaction) {
+        transactionRepository.save(transaction);
+    }
 
 
     public boolean checkTransaction(Transaction transaction) {
@@ -24,7 +30,7 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByRoleIdNotLikeAndNotOrderId("ADMIN", transaction.getOrderingId());
         Date lastTransaction = transactionRepository.findLastTransactionDate(transaction.getOrderingId());
         // if 2 transactions is done without 1 second of difference
-        if(lastTransaction!=null && transaction.getDate().before(new Date(lastTransaction.getTime()+1000l))){
+        if (lastTransaction != null && transaction.getDate().before(new Date(lastTransaction.getTime() + 1000l))) {
             return false;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -39,21 +45,19 @@ public class TransactionService {
         // Up to (2*1.5) = 3  transactions any day is allowed. (For initialization)
         BigDecimal maximum = new BigDecimal("2");
 
-        if (transactions!=null){
+        if (transactions != null) {
             for (Transaction trans : transactions) {
                 String date1 = simpleDateFormat.format(trans.getDate());
                 String date2 = simpleDateFormat.format(new Date(trans.getDate().getTime() - 86400000l));
                 BigDecimal max = transactionRepository.findMaxIn24HPeriodsForAnyOne(date1, date2, transaction.getOrderingId());
-                if (max.compareTo(maximum) > 0) {
+                if (max != null && max.compareTo(maximum) > 0) {
                     maximum = max;
                 }
             }
         }
-        if (totalWithThisTrans.compareTo(maximum.multiply(new BigDecimal("1.5"))) > 0)
-        {
+        if (totalWithThisTrans.compareTo(maximum.multiply(new BigDecimal("1.5"))) > 0) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }

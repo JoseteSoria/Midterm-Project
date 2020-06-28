@@ -8,25 +8,22 @@ import com.ironhack.MidtermProject.model.user.AccountHolder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Date;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
-public class CheckingAcc extends Account{
+public class CheckingAcc extends Account {
     private String secretKey;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "minBalance_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "minBalance_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "minBalance_currency")),
     })
     private Money minimumBalance;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "monthFee_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "monthFee_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "monthFee_currency")),
     })
     private Money monthlyMaintenanceFee;
     @JsonIgnore
@@ -39,7 +36,10 @@ public class CheckingAcc extends Account{
         this.monthlyMaintenanceFee = new Money(new BigDecimal("12"));
         this.dateMonthlyMaintenance = new Date();
     }
-    /**Constructor without monthlyMaintenanceFee nor minimumBalance nor secret Key**/
+
+    /**
+     * Constructor without monthlyMaintenanceFee nor minimumBalance nor secret Key
+     **/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
@@ -49,7 +49,9 @@ public class CheckingAcc extends Account{
         this.dateMonthlyMaintenance = new Date();
     }
 
-    /**Constructor without secretKey**/
+    /**
+     * Constructor without secretKey
+     **/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
@@ -59,7 +61,9 @@ public class CheckingAcc extends Account{
         this.dateMonthlyMaintenance = new Date();
     }
 
-    /**Constructor with everything**/
+    /**
+     * Constructor with everything
+     **/
     public CheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, Money monthlyMaintenanceFee, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         setSecretKey(secretKey);
@@ -77,11 +81,11 @@ public class CheckingAcc extends Account{
         this.secretKey = secretKey;
     }
 
-    public String generateKey(){
+    public String generateKey() {
 //        Base64.getEncoder().encodeToString(LocalDateTime.now().toString().getBytes())
         String str = "ES";
-        for(int i = 0; i<22; i++) {
-            str += String.valueOf((int)(Math.random()*10));
+        for (int i = 0; i < 22; i++) {
+            str += String.valueOf((int) (Math.random() * 10));
         }
         return str;
     }
@@ -107,7 +111,7 @@ public class CheckingAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        if(status == null) this.status = Status.ACTIVE;
+        if (status == null) this.status = Status.ACTIVE;
         else this.status = status;
     }
 
@@ -120,25 +124,25 @@ public class CheckingAcc extends Account{
     }
 
     @Override
-    public void reduceBalance(Money balance){
-        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+    public void reduceBalance(Money balance) {
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount()) <= 0) {
             throw new NotEnoughMoneyException("Your balance has reach the minimum balance");
         }
         super.reduceBalance(balance);
-        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount()) < 0) {
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
         }
     }
 
     public void updateDateInterestRate() {
         // if more than a month
-        if(this.dateMonthlyMaintenance.before(new Date(System.currentTimeMillis()-2629743000l ))) {
+        if (this.dateMonthlyMaintenance.before(new Date(System.currentTimeMillis() - 2629743000l))) {
             // number of months
-            Integer months = Integer.valueOf((int)((System.currentTimeMillis()-this.dateMonthlyMaintenance.getTime())/2629743000l));
-            for(int i = 0; i< months; i++){
+            Integer months = Integer.valueOf((int) ((System.currentTimeMillis() - this.dateMonthlyMaintenance.getTime()) / 2629743000l));
+            for (int i = 0; i < months; i++) {
                 this.reduceBalance(this.monthlyMaintenanceFee);
             }
-            setDateMonthlyMaintenance(new Date(this.getDateMonthlyMaintenance().getTime()+(months*2629743000l)));
+            setDateMonthlyMaintenance(new Date(this.getDateMonthlyMaintenance().getTime() + (months * 2629743000l)));
         }
     }
 }

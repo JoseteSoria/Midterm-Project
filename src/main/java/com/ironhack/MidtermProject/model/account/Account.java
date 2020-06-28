@@ -26,13 +26,13 @@ public abstract class Account {
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "balance_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "balance_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "balance_currency")),
     })
     protected Money balance;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "penaltyFee_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "penaltyFee_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "penaltyFee_currency")),
     })
     protected Money penaltyFee;
 
@@ -43,10 +43,11 @@ public abstract class Account {
     @OneToMany(mappedBy = "beneficiaryAccount")
     public List<Transaction> transactionsAsBeneficiary;
 
-    public Account(){}
+    public Account() {
+    }
 
     public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
-        setOwners(primaryOwner,secondaryOwner);
+        setOwners(primaryOwner, secondaryOwner);
         setBalance(balance);
         this.penaltyFee = new Money(new BigDecimal("40"));
     }
@@ -72,20 +73,18 @@ public abstract class Account {
     }
 
     public void setBalance(Money balance) {
-        if(balance == null) this.balance = new Money(new BigDecimal("0"));
+        if (balance == null) this.balance = new Money(new BigDecimal("0"));
         else this.balance = balance;
     }
 
-    public void setOwners(AccountHolder primaryOwner, AccountHolder secondaryOwner){
-        if(primaryOwner!= null){
+    public void setOwners(AccountHolder primaryOwner, AccountHolder secondaryOwner) {
+        if (primaryOwner != null) {
             setPrimaryOwner(primaryOwner);
             setSecondaryOwner(secondaryOwner);
-        }
-        else if(primaryOwner == null && secondaryOwner!= null){
+        } else if (primaryOwner == null && secondaryOwner != null) {
             setPrimaryOwner(secondaryOwner);
             setSecondaryOwner(null);
-        }
-        else{
+        } else {
             throw new NoOwnerException("At least 1 Owner has to be provided");
         }
     }
@@ -106,18 +105,18 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
     }
 
-    public void addBalance(Money balance){
-        if (balance.getCurrency()!= this.balance.getCurrency()){
+    public void addBalance(Money balance) {
+        if (balance.getCurrency() != this.balance.getCurrency()) {
             balance = Helpers.convertMoney(balance, this.balance);
         }
         this.balance.increaseAmount(balance.getAmount());
     }
 
-    public void reduceBalance(Money balance){
-        if (balance.getCurrency()!= this.balance.getCurrency()){
+    public void reduceBalance(Money balance) {
+        if (balance.getCurrency() != this.balance.getCurrency()) {
             balance = Helpers.convertMoney(balance, this.balance);
         }
-        if(this.balance.getAmount().compareTo(balance.getAmount())<0) {
+        if (this.balance.getAmount().compareTo(balance.getAmount()) < 0) {
             throw new NotEnoughMoneyException("There is not so much money");
         }
         this.balance.decreaseAmount(balance.getAmount());

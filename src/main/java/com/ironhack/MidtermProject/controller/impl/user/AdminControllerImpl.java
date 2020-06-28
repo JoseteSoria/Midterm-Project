@@ -1,4 +1,5 @@
 package com.ironhack.MidtermProject.controller.impl.user;
+
 import com.ironhack.MidtermProject.controller.interfaces.user.AdminController;
 import com.ironhack.MidtermProject.model.user.Admin;
 import com.ironhack.MidtermProject.service.user.AdminService;
@@ -16,9 +17,13 @@ public class AdminControllerImpl implements AdminController {
 
     @GetMapping("/admins")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<Admin> findAll(){ return adminService.findAll(); }
+    public List<Admin> findAll() {
+        return adminService.findAll();
+    }
 
     @PostMapping("/admins")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Admin store(@RequestBody Admin admin){ return adminService.create(admin); }
+    public Admin store(@RequestBody Admin admin) {
+        return adminService.create(admin);
+    }
 }

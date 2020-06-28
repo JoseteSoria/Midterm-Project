@@ -3,9 +3,6 @@ package com.ironhack.MidtermProject.controller.interfaces.account;
 import com.ironhack.MidtermProject.dto.CheckingAccCreation;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.user.User;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.Currency;

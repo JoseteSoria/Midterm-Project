@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -21,11 +20,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -43,7 +40,7 @@ class UserControllerImplTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    User u1,u2;
+    User u1, u2;
     private List<User> users;
     CustomSecurityUser cu1;
 
@@ -52,9 +49,9 @@ class UserControllerImplTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).apply(springSecurity()).build();
         u1 = new User("Dreamworks", "dreamworks", "dreamworks", Role.ADMIN);
         u2 = new User("Hercules", "strongman", "strongman", Role.ACCOUNT_HOLDER);
-        users = Stream.of(u1,u2).collect(Collectors.toList());
+        users = Stream.of(u1, u2).collect(Collectors.toList());
         userRepository.saveAll(Stream.of(u1, u2).collect(Collectors.toList()));
-        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks","dreamworks"));
+        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks", "dreamworks"));
     }
 
     @AfterEach

@@ -48,48 +48,48 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST, "/checking-accounts").hasAuthority("ADMIN")
                 .mvcMatchers("/checking-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/checking-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
-                .mvcMatchers( "/checking-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
+                .mvcMatchers("/checking-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers(HttpMethod.PUT, "/checking-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
 
                 //CreditCardAcc
                 .mvcMatchers(HttpMethod.GET, "/credit-card-accounts").hasAuthority("ADMIN")
-                .mvcMatchers(HttpMethod.POST,"/credit-card-accounts").hasAuthority("ADMIN")
-                .mvcMatchers("/credit-card-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
+                .mvcMatchers(HttpMethod.POST, "/credit-card-accounts").hasAuthority("ADMIN")
+                .mvcMatchers("/credit-card-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/credit-card-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers("/credit-card-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
 
                 //SavingsAcc
-                .mvcMatchers(HttpMethod.GET,"/savings-accounts").hasAuthority("ADMIN")
-                .mvcMatchers(HttpMethod.POST,"/savings-accounts").hasAuthority("ADMIN")
-                .mvcMatchers("/savings-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/savings-accounts").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.POST, "/savings-accounts").hasAuthority("ADMIN")
+                .mvcMatchers("/savings-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/savings-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers("/savings-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
-                .mvcMatchers(HttpMethod.PUT,"/savings-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.PUT, "/savings-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
 
                 //StudentCheckingAcc
-                .mvcMatchers(HttpMethod.GET,"/student-checking-accounts").hasAuthority("ADMIN")
-                .mvcMatchers("/student-checking-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/student-checking-accounts").hasAuthority("ADMIN")
+                .mvcMatchers("/student-checking-accounts/{id}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/student-checking-accounts/{id}/debit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
                 .mvcMatchers("/student-checking-accounts/{id}/credit").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN", "THIRD_PARTY")
-                .mvcMatchers(HttpMethod.PUT,"/student-checking-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.PUT, "/student-checking-accounts/{id}/set-status/{status}").hasAuthority("ADMIN")
 
                 //Transaction
                 .mvcMatchers("/transactions").hasAuthority("ADMIN")
 
                 //AccountHolder
-                .mvcMatchers(HttpMethod.GET,"/account-holders").hasAuthority("ADMIN")
-                .mvcMatchers(HttpMethod.POST,"/account-holders").hasAuthority("ADMIN")
-                .mvcMatchers("/account-holders/{id}").hasAnyAuthority("ACCOUNT_HOLDER","ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/account-holders").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.POST, "/account-holders").hasAuthority("ADMIN")
+                .mvcMatchers("/account-holders/{id}").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/account-holders/{id}/accounts").hasAnyAuthority("ACCOUNT_HOLDER", "ADMIN")
                 .mvcMatchers("/account-holders/logged-in/{looggedIn}").hasAnyAuthority("ACCOUNT_HOLDER")
                 .mvcMatchers("/account-holders/transference/{id}").hasAnyAuthority("ACCOUNT_HOLDER")
 
                 //Admin
-                .mvcMatchers(HttpMethod.GET,"/admins").hasAuthority("ADMIN")
-                .mvcMatchers(HttpMethod.POST,"/admins").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/admins").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.POST, "/admins").hasAuthority("ADMIN")
 
                 //ThirdParty
-                .mvcMatchers(HttpMethod.GET,"/third-parties").hasAuthority("ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/third-parties").hasAuthority("ADMIN")
                 .mvcMatchers(HttpMethod.POST, "/third-parties").hasAuthority("ADMIN")
 
                 //User

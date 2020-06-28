@@ -13,11 +13,13 @@ public class ThirdPartyService {
     @Autowired
     private ThirdPartyRepository thirdPartyRepository;
 
-    public List<ThirdParty> findAll(){ return thirdPartyRepository.findAll(); }
+    public List<ThirdParty> findAll() {
+        return thirdPartyRepository.findAll();
+    }
 
     public ThirdParty store(ThirdParty thirdParty) {
         ThirdParty party = new ThirdParty(thirdParty.getName(), thirdParty.getUsername(), thirdParty.getPassword(),
-        thirdParty.getHashKey());
+                thirdParty.getHashKey());
         return thirdPartyRepository.save(party);
     }
 }

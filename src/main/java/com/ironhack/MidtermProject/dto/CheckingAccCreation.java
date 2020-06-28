@@ -13,7 +13,7 @@ public class CheckingAccCreation {
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "balance_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "balance_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "balance_currency")),
     })
     private Money balance;
 
@@ -21,7 +21,8 @@ public class CheckingAccCreation {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public CheckingAccCreation(){}
+    public CheckingAccCreation() {
+    }
 
     public CheckingAccCreation(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
         this.primaryOwner = primaryOwner;
@@ -71,10 +72,10 @@ public class CheckingAccCreation {
         this.secretKey = secretKey;
     }
 
-    public String generateKey(){
+    public String generateKey() {
         String str = "ES";
-        for(int i = 0; i<22; i++) {
-            str += String.valueOf((int)(Math.random()*10));
+        for (int i = 0; i < 22; i++) {
+            str += String.valueOf((int) (Math.random() * 10));
         }
         return str;
     }

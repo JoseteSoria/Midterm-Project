@@ -33,7 +33,6 @@ import java.sql.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -87,15 +86,15 @@ class AccountHolderControllerImplTest {
         ah1.setLoggedIn(true);
         ah2 = new AccountHolder("Hercules", "strongman", "strongman", d2, add1, null);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         party1 = new ThirdParty("Third", "third", "third", "third-hashkey");
         accountHolderRepository.saveAll(Stream.of(ah1, ah2, ah3).collect(Collectors.toList()));
         adminRepository.save(admin1);
         thirdPartyRepository.save(party1);
-        ac1 = new CheckingAcc(ah1,ah2,new Money(new BigDecimal("5000")), Status.ACTIVE);
-        ac2 = new CheckingAcc(ah1,ah3,new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac1 = new CheckingAcc(ah1, ah2, new Money(new BigDecimal("5000")), Status.ACTIVE);
+        ac2 = new CheckingAcc(ah1, ah3, new Money(new BigDecimal("1000")), Status.ACTIVE);
         checkingAccRepository.saveAll(Stream.of(ac1, ac2).collect(Collectors.toList()));
-        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks","dreamworks"));
+        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks", "dreamworks"));
         cu2 = new CustomSecurityUser(new AccountHolder("Simba", "kinglyon", "kinglyon", d1, add1, null));
         cu2.setId(ah1.getId());
     }
@@ -147,19 +146,19 @@ class AccountHolderControllerImplTest {
     }
 
     @Test
-    void transference() throws Exception{
-        mockMvc.perform(post("/account-holders/transference/" + ac1.getId() + "?receiver-account-id="+ ac2.getId() + "&amount=400").with(user(cu2))).andExpect(status().is2xxSuccessful());
+    void transference() throws Exception {
+        mockMvc.perform(post("/account-holders/transference/" + ac1.getId() + "?receiver-account-id=" + ac2.getId() + "&amount=400").with(user(cu2))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
-    void transference_Fraud() throws Exception{
-        CreditCardAcc creditCardAcc = new CreditCardAcc(ah1,null,new Money(new BigDecimal("10000")), new BigDecimal("0.2"));
+    void transference_Fraud() throws Exception {
+        CreditCardAcc creditCardAcc = new CreditCardAcc(ah1, null, new Money(new BigDecimal("10000")), new BigDecimal("0.2"));
         creditCardAccRepository.save(creditCardAcc);
-        mockMvc.perform(post("/account-holders/transference/" + creditCardAcc.getId() + "?receiver-account-id="+ ac1.getId() + "&amount=400").with(user(cu2))).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(post("/account-holders/transference/" + creditCardAcc.getId() + "?receiver-account-id=" + ac1.getId() + "&amount=400").with(user(cu2))).andExpect(status().is2xxSuccessful());
         Transaction transaction = transactionRepository.findAll().get(0);
         transaction.setDate(new Date(System.currentTimeMillis()));
         transactionRepository.save(transaction);
-        mockMvc.perform(post("/account-holders/transference/" + creditCardAcc.getId() + "?receiver-account-id="+ ac2.getId() + "&amount=400").with(user(cu2))).andExpect(status().isNotAcceptable());
+        mockMvc.perform(post("/account-holders/transference/" + creditCardAcc.getId() + "?receiver-account-id=" + ac2.getId() + "&amount=400").with(user(cu2))).andExpect(status().isNotAcceptable());
     }
 
 }

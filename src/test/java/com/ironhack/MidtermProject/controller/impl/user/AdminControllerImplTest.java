@@ -2,12 +2,9 @@ package com.ironhack.MidtermProject.controller.impl.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ironhack.MidtermProject.model.user.Admin;
-import com.ironhack.MidtermProject.model.user.ThirdParty;
 import com.ironhack.MidtermProject.repository.user.AdminRepository;
-import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
 import com.ironhack.MidtermProject.security.CustomSecurityUser;
 import com.ironhack.MidtermProject.service.user.AdminService;
-import com.ironhack.MidtermProject.service.user.ThirdPartyService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,9 +41,9 @@ class AdminControllerImplTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).apply(springSecurity()).build();
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         adminRepository.save(admin1);
-        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks","dreamworks"));
+        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks", "dreamworks"));
     }
 
     @AfterEach

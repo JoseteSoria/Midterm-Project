@@ -16,11 +16,13 @@ public class ThirdPartyControllerImpl implements ThirdPartyController {
 
     @GetMapping("/third-parties")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<ThirdParty> findAll(){ return thirdPartyService.findAll(); }
+    public List<ThirdParty> findAll() {
+        return thirdPartyService.findAll();
+    }
 
     @PostMapping("/third-parties")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public ThirdParty create(@RequestBody ThirdParty thirdParty){
+    public ThirdParty create(@RequestBody ThirdParty thirdParty) {
         return thirdPartyService.store(thirdParty);
     }
 }

@@ -18,7 +18,7 @@ public class UserControllerImpl implements UserController {
 
     @GetMapping("/users")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<User> findAll(){
+    public List<User> findAll() {
         return userService.findAll();
     }
 

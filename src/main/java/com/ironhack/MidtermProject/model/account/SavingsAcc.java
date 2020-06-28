@@ -12,15 +12,15 @@ import java.util.Date;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
-public class SavingsAcc extends Account{
-//    @Id
+public class SavingsAcc extends Account {
+    //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Integer id;
     private String secretKey;
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "minBalance_amount")),
-            @AttributeOverride(name = "currency",column = @Column(name = "minBalance_currency")),
+            @AttributeOverride(name = "currency", column = @Column(name = "minBalance_currency")),
     })
     private Money minimumBalance;
     private BigDecimal interestRate;
@@ -35,7 +35,9 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-    /**Constructor without interestRate nor minimumBalance or secretKey**/
+    /**
+     * Constructor without interestRate nor minimumBalance or secretKey
+     **/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
@@ -45,7 +47,9 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-    /**Constructor without secretKey**/
+    /**
+     * Constructor without secretKey
+     **/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Money minimumBalance, BigDecimal interestRate, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
@@ -55,7 +59,9 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = new Date();
     }
 
-    /**Constructor with everything**/
+    /**
+     * Constructor with everything
+     **/
     public SavingsAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Money minimumBalance, BigDecimal interestRate, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         setSecretKey(secretKey);
@@ -73,10 +79,10 @@ public class SavingsAcc extends Account{
         this.secretKey = secretKey;
     }
 
-    public String generateKey(){
+    public String generateKey() {
         String str = "ES";
-        for(int i = 0; i<22; i++) {
-            str += String.valueOf((int)(Math.random()*10));
+        for (int i = 0; i < 22; i++) {
+            str += String.valueOf((int) (Math.random() * 10));
         }
         return str;
     }
@@ -86,14 +92,13 @@ public class SavingsAcc extends Account{
     }
 
     public void setMinimumBalance(Money minimumBalance) {
-        if(minimumBalance == null){
+        if (minimumBalance == null) {
             this.minimumBalance = new Money(new BigDecimal("1000"));
-        }
-        else if(minimumBalance.getAmount().compareTo(new BigDecimal("1000"))>=0) {
+        } else if (minimumBalance.getAmount().compareTo(new BigDecimal("1000")) >= 0) {
             this.minimumBalance = new Money(new BigDecimal("1000"));
-        }else if(minimumBalance.getAmount().compareTo(new BigDecimal("100"))<=0) {
+        } else if (minimumBalance.getAmount().compareTo(new BigDecimal("100")) <= 0) {
             this.minimumBalance = new Money(new BigDecimal("100"));
-        }else {
+        } else {
             this.minimumBalance = minimumBalance;
         }
     }
@@ -103,7 +108,7 @@ public class SavingsAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        if(status == null) this.status = Status.ACTIVE;
+        if (status == null) this.status = Status.ACTIVE;
         else this.status = status;
     }
 
@@ -112,28 +117,25 @@ public class SavingsAcc extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        if(interestRate == null){
+        if (interestRate == null) {
             this.interestRate = new BigDecimal("0.0025");
-        }
-        else if(interestRate.compareTo(new BigDecimal("0.5")) >= 0){
+        } else if (interestRate.compareTo(new BigDecimal("0.5")) >= 0) {
             this.interestRate = new BigDecimal("0.5");
-        }
-        else if(interestRate.compareTo(new BigDecimal("0.0025")) <= 0){
+        } else if (interestRate.compareTo(new BigDecimal("0.0025")) <= 0) {
             this.interestRate = new BigDecimal("0.0025");
-        }
-        else{
+        } else {
             this.interestRate = interestRate;
         }
 
     }
 
     @Override
-    public void reduceBalance(Money balance){
-        if(this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<=0){
+    public void reduceBalance(Money balance) {
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount()) <= 0) {
             throw new NotEnoughMoneyException("Your balance has reach the minimum balance");
         }
         super.reduceBalance(balance);
-        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount())<0){
+        if (this.getBalance().getAmount().compareTo(this.getMinimumBalance().getAmount()) < 0) {
             this.getBalance().decreaseAmount(this.getPenaltyFee().getAmount());
         }
     }
@@ -146,13 +148,13 @@ public class SavingsAcc extends Account{
         this.dateInterestRate = dateInterestRate;
     }
 
-    public void updateDateInterestRate(){
-        if(this.dateInterestRate.before(new Date(System.currentTimeMillis()-31556926000l ))) {
-            Integer years = Integer.valueOf((int)((System.currentTimeMillis()-this.dateInterestRate.getTime())/31556926000l));
-                for (int i = 0; i < years; i++) {
-                    this.addBalance(new Money(this.balance.getAmount().multiply(this.interestRate)));
-                }
-            setDateInterestRate(new Date(this.getDateInterestRate().getTime()+(years*31556926000l)));
+    public void updateDateInterestRate() {
+        if (this.dateInterestRate.before(new Date(System.currentTimeMillis() - 31556926000l))) {
+            Integer years = Integer.valueOf((int) ((System.currentTimeMillis() - this.dateInterestRate.getTime()) / 31556926000l));
+            for (int i = 0; i < years; i++) {
+                this.addBalance(new Money(this.balance.getAmount().multiply(this.interestRate)));
+            }
+            setDateInterestRate(new Date(this.getDateInterestRate().getTime() + (years * 31556926000l)));
         }
     }
 

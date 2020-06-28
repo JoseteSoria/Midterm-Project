@@ -8,7 +8,7 @@
             [%15.15t] %style{%-40.40C{1.}}{cyan} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
         </Console>
         <NoSql name="databaseAppender">
-            <MongoDb databaseName="midterm_logs" collectionName="applicationLog" server="127.0.0.1" port="27017" />
+            <MongoDb databaseName="midterm_logs" collectionName="applicationLog" server="127.0.0.1" port="27017"/>
         </NoSql>
         <File name="MidTerm_Logs" fileName="logs/app.log">
             <PatternLayout>
@@ -23,23 +23,23 @@
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
-        <Logger name = "com.ironhack.MidtermProject.service.account.CheckingAccService" level="info">
+        <Logger name="com.ironhack.MidtermProject.service.account.CheckingAccService" level="info">
             <AppenderRef ref="Async"/>
             <AppenderRef ref="databaseAppender"/>
         </Logger>
-        <Logger name = "com.ironhack.MidtermProject.service.account.CreditCardAccService" level="info">
+        <Logger name="com.ironhack.MidtermProject.service.account.CreditCardAccService" level="info">
             <AppenderRef ref="Async"/>
             <AppenderRef ref="databaseAppender"/>
         </Logger>
-        <Logger name = "com.ironhack.MidtermProject.service.account.SavingsAccService" level="info">
+        <Logger name="com.ironhack.MidtermProject.service.account.SavingsAccService" level="info">
             <AppenderRef ref="Async"/>
             <AppenderRef ref="databaseAppender"/>
         </Logger>
-        <Logger name = "com.ironhack.MidtermProject.service.account.StudentCheckingAccService" level="info">
+        <Logger name="com.ironhack.MidtermProject.service.account.StudentCheckingAccService" level="info">
             <AppenderRef ref="Async"/>
             <AppenderRef ref="databaseAppender"/>
         </Logger>
-        <Logger name = "com.ironhack.MidtermProject.service.user.AccountHolderService" level="info">
+        <Logger name="com.ironhack.MidtermProject.service.user.AccountHolderService" level="info">
             <AppenderRef ref="Async"/>
             <AppenderRef ref="databaseAppender"/>
         </Logger>

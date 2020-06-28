@@ -2,12 +2,8 @@ package com.ironhack.MidtermProject.controller.impl.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ironhack.MidtermProject.enums.Role;
-import com.ironhack.MidtermProject.model.user.Admin;
 import com.ironhack.MidtermProject.model.user.User;
-import com.ironhack.MidtermProject.repository.user.UserRepository;
-import com.ironhack.MidtermProject.security.CustomSecurityUser;
 import com.ironhack.MidtermProject.service.user.UserService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +33,7 @@ class UserControllerImplTestUnit {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    User u1,u2;
+    User u1, u2;
     private List<User> users;
 
     @BeforeEach

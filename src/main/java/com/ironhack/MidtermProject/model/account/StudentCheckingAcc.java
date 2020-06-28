@@ -4,25 +4,33 @@ import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
-public class StudentCheckingAcc extends Account{
+public class StudentCheckingAcc extends Account {
     private String secretKey;
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public StudentCheckingAcc() {}
+    public StudentCheckingAcc() {
+    }
 
-    /**Constructor without secretKey**/
+    /**
+     * Constructor without secretKey
+     **/
     public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = generateKey();
         setStatus(status);
     }
-    /**Constructor with everything**/
+
+    /**
+     * Constructor with everything
+     **/
     public StudentCheckingAcc(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, String secretKey, Status status) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
@@ -45,10 +53,10 @@ public class StudentCheckingAcc extends Account{
         this.secretKey = secretKey;
     }
 
-    public String generateKey(){
+    public String generateKey() {
         String str = "ES";
-        for(int i = 0; i<22; i++) {
-            str += String.valueOf((int)(Math.random()*10));
+        for (int i = 0; i < 22; i++) {
+            str += String.valueOf((int) (Math.random() * 10));
         }
         return str;
     }
@@ -58,7 +66,7 @@ public class StudentCheckingAcc extends Account{
     }
 
     public void setStatus(Status status) {
-        if(status == null) this.status = Status.ACTIVE;
+        if (status == null) this.status = Status.ACTIVE;
         else this.status = status;
     }
 }

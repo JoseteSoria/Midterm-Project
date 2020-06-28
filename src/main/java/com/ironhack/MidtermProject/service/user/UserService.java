@@ -23,9 +23,11 @@ public class UserService implements UserDetailsService, Serializable {
     private static final long serialVersionUID = 2L;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    public List<User> findAll(){ return userRepository.findAll(); }
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -1,9 +1,6 @@
 package com.ironhack.MidtermProject.controller.impl.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ironhack.MidtermProject.enums.Status;
-import com.ironhack.MidtermProject.model.account.CheckingAcc;
-import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.Admin;
 import com.ironhack.MidtermProject.model.user.ThirdParty;
 import com.ironhack.MidtermProject.repository.user.AdminRepository;
@@ -20,11 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.math.BigDecimal;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,7 +42,7 @@ class ThirdPartyControllerImplTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    ThirdParty t1,t2;
+    ThirdParty t1, t2;
     Admin admin1;
     CustomSecurityUser cu1;
 
@@ -57,9 +52,9 @@ class ThirdPartyControllerImplTest {
         t1 = new ThirdParty("Simba", "kinglyon", "kinglyon", "kinglyon-hashkey");
         t2 = new ThirdParty("Hercules", "strongman", "strongman", "strongman-hashkey");
         thirdPartyRepository.saveAll(Stream.of(t1, t2).collect(Collectors.toList()));
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         adminRepository.save(admin1);
-        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks","dreamworks"));
+        cu1 = new CustomSecurityUser(new Admin("Dreamworks", "dreamworks", "dreamworks"));
     }
 
     @AfterEach

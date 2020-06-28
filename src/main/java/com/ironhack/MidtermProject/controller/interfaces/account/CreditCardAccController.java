@@ -1,7 +1,5 @@
 package com.ironhack.MidtermProject.controller.interfaces.account;
 
-import com.ironhack.MidtermProject.dto.CheckingAccCreation;
-import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.CreditCardAcc;
 import com.ironhack.MidtermProject.model.user.User;
 

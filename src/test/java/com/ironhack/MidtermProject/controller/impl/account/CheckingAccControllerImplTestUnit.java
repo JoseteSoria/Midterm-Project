@@ -3,23 +3,13 @@ package com.ironhack.MidtermProject.controller.impl.account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ironhack.MidtermProject.dto.CheckingAccCreation;
 import com.ironhack.MidtermProject.enums.Status;
-import com.ironhack.MidtermProject.model.account.Account;
 import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Address;
 import com.ironhack.MidtermProject.model.classes.Money;
 import com.ironhack.MidtermProject.model.user.AccountHolder;
 import com.ironhack.MidtermProject.model.user.Admin;
 import com.ironhack.MidtermProject.model.user.ThirdParty;
-import com.ironhack.MidtermProject.repository.account.AccountRepository;
-import com.ironhack.MidtermProject.repository.account.CheckingAccRepository;
-import com.ironhack.MidtermProject.repository.account.StudentCheckingAccRepository;
-import com.ironhack.MidtermProject.repository.classes.TransactionRepository;
-import com.ironhack.MidtermProject.repository.user.AccountHolderRepository;
-import com.ironhack.MidtermProject.repository.user.AdminRepository;
-import com.ironhack.MidtermProject.repository.user.ThirdPartyRepository;
-import com.ironhack.MidtermProject.security.CustomSecurityUser;
 import com.ironhack.MidtermProject.service.account.CheckingAccService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +24,10 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -74,22 +59,26 @@ class CheckingAccControllerImplTestUnit {
         ah1.setId(1);
         ah2 = new AccountHolder("Hercules", "strongman", "strongman", d2, add1, null);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         party1 = new ThirdParty("Third", "third", "third", "third-hashkey");
-        ac1 = new CheckingAcc(ah1,ah2,new Money(new BigDecimal("5000")), Status.ACTIVE);
+        ac1 = new CheckingAcc(ah1, ah2, new Money(new BigDecimal("5000")), Status.ACTIVE);
         ac1.setId(1);
-        ac2 = new CheckingAcc(ah1,ah3,new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac2 = new CheckingAcc(ah1, ah3, new Money(new BigDecimal("1000")), Status.ACTIVE);
         ac2.setId(2);
-        CheckingAccCreation checkingAccCreation = new CheckingAccCreation(ah1,ah2,new Money(new BigDecimal("8000")));
-        List<CheckingAcc> checkingAccs = Arrays.asList(ac1,ac2);
+        CheckingAccCreation checkingAccCreation = new CheckingAccCreation(ah1, ah2, new Money(new BigDecimal("8000")));
+        List<CheckingAcc> checkingAccs = Arrays.asList(ac1, ac2);
         when(checkingAccService.findAll()).thenReturn(checkingAccs);
         when(checkingAccService.checkFindById(1, ah1)).thenReturn(ac1);
-        doAnswer(i->{return null;}).when(checkingAccService).addBalance(ah1,ac1.getId(),new BigDecimal("100"),null, "ksdhuf","skdhfs");
-        doAnswer(i->{return null;}).when(checkingAccService).reduceBalance(ah1,ac1.getId(),new BigDecimal("100"),null, "ksdhuf","skdhfs");
+        doAnswer(i -> {
+            return null;
+        }).when(checkingAccService).addBalance(ah1, ac1.getId(), new BigDecimal("100"), null, "ksdhuf", "skdhfs");
+        doAnswer(i -> {
+            return null;
+        }).when(checkingAccService).reduceBalance(ah1, ac1.getId(), new BigDecimal("100"), null, "ksdhuf", "skdhfs");
         when(checkingAccService.create(checkingAccCreation)).thenReturn(checkingAccCreation);
         CheckingAcc ac4 = ac1;
         ac4.setStatus(Status.FROZEN);
-        when(checkingAccService.changeStatus(ac1.getId(),"FROZEN")).thenReturn(ac4);
+        when(checkingAccService.changeStatus(ac1.getId(), "FROZEN")).thenReturn(ac4);
     }
 
 
@@ -107,17 +96,17 @@ class CheckingAccControllerImplTestUnit {
 
     @Test
     void addBalance() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/credit?amount="  + String.valueOf(100))).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/credit?amount=" + String.valueOf(100))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void reduceBalance() throws Exception {
-        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount="  + String.valueOf(100))).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(patch("/checking-accounts/" + ac1.getId() + "/debit?amount=" + String.valueOf(100))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void store() throws Exception {
-        CheckingAccCreation checkingAccCreation = new CheckingAccCreation(ah1,ah2,new Money(new BigDecimal("8000")));
+        CheckingAccCreation checkingAccCreation = new CheckingAccCreation(ah1, ah2, new Money(new BigDecimal("8000")));
         mockMvc.perform(post("/checking-accounts").content(objectMapper.writeValueAsString(checkingAccCreation))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString().contains("7000");
@@ -125,7 +114,7 @@ class CheckingAccControllerImplTestUnit {
 
     @Test
     void changeStatus() throws Exception {
-        mockMvc.perform(put("/checking-accounts/"+ ac1.getId() +"/set-status/FROZEN")).andExpect(status().isNoContent())
+        mockMvc.perform(put("/checking-accounts/" + ac1.getId() + "/set-status/FROZEN")).andExpect(status().isNoContent())
                 .andReturn().getResponse().getContentAsString().contains("FROZEN");
     }
 

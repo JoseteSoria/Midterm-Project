@@ -18,7 +18,7 @@ public class TransactionControllerImpl implements TransactionController {
 
     @GetMapping("/transactions")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<Transaction> findAll(){
+    public List<Transaction> findAll() {
         return transactionService.findAll();
     }
 }

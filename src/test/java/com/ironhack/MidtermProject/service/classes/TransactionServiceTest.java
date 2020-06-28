@@ -2,8 +2,6 @@ package com.ironhack.MidtermProject.service.classes;
 
 import com.ironhack.MidtermProject.enums.Status;
 import com.ironhack.MidtermProject.enums.TransactionType;
-import com.ironhack.MidtermProject.model.account.Account;
-import com.ironhack.MidtermProject.model.account.CheckingAcc;
 import com.ironhack.MidtermProject.model.account.StudentCheckingAcc;
 import com.ironhack.MidtermProject.model.classes.Address;
 import com.ironhack.MidtermProject.model.classes.Money;
@@ -29,7 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class TransactionServiceTest {
@@ -65,13 +64,13 @@ class TransactionServiceTest {
         ah1 = new AccountHolder("Simba", "kinglyon", "kinglyon", d1, add1, null);
         ah2 = new AccountHolder("Hercules", "strongman", "strongman", d2, add1, null);
         ah3 = new AccountHolder("Pinocho", "woodman", "woodman", d2, add1, null);
-        admin1 = new Admin("Dreamworks", "dreamworks","dreamworks");
+        admin1 = new Admin("Dreamworks", "dreamworks", "dreamworks");
         party1 = new ThirdParty("Third", "third", "third", "third-hashkey");
         accountHolderRepository.saveAll(Stream.of(ah1, ah2, ah3).collect(Collectors.toList()));
         adminRepository.save(admin1);
         thirdPartyRepository.save(party1);
-        ac1 = new StudentCheckingAcc(ah1,ah2,new Money(new BigDecimal("1000")), Status.ACTIVE);
-        ac2 = new StudentCheckingAcc(ah3,null,new Money(new BigDecimal("3000")), Status.ACTIVE);
+        ac1 = new StudentCheckingAcc(ah1, ah2, new Money(new BigDecimal("1000")), Status.ACTIVE);
+        ac2 = new StudentCheckingAcc(ah3, null, new Money(new BigDecimal("3000")), Status.ACTIVE);
         accountRepository.saveAll(Stream.of(ac1, ac2).collect(Collectors.toList()));
         t2 = new Transaction();
         t1 = new Transaction(ah1.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
@@ -88,38 +87,38 @@ class TransactionServiceTest {
     }
 
     @Test
-    void findAll(){
+    void findAll() {
         List<Transaction> transactions = transactionService.findAll();
         assertEquals(1, transactions.size());
     }
 
     @Test
-    void checkTransaction_FirstOne(){
+    void checkTransaction_FirstOne() {
         Transaction t3 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
         t3.setDate(new Date(System.currentTimeMillis() + 86400000l));
         assertTrue(transactionService.checkTransaction(t3));
     }
 
     @Test
-    void checkTransaction_LessThanOneSecond(){
+    void checkTransaction_LessThanOneSecond() {
         Transaction t3 = new Transaction(ah1.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t3.setDate(new Date(t1.getDate().getTime()+500l));
+        t3.setDate(new Date(t1.getDate().getTime() + 500l));
         assertTrue(!transactionService.checkTransaction(t3));
     }
 
     @Test
-    void checkTransaction_ToMuchTransactions(){
+    void checkTransaction_ToMuchTransactions() {
         Transaction t3 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t3.setDate(new Date(t1.getDate().getTime()+50000l));
+        t3.setDate(new Date(t1.getDate().getTime() + 50000l));
         Transaction t4 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t4.setDate(new Date(t1.getDate().getTime()+100000l));
+        t4.setDate(new Date(t1.getDate().getTime() + 100000l));
         Transaction t5 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t5.setDate(new Date(t1.getDate().getTime()+150000l));
+        t5.setDate(new Date(t1.getDate().getTime() + 150000l));
         Transaction t6 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t6.setDate(new Date(t1.getDate().getTime()+200000l));
-        transactionRepository.saveAll(Stream.of(t3,t4,t5).collect(Collectors.toList()));
+        t6.setDate(new Date(t1.getDate().getTime() + 200000l));
+        transactionRepository.saveAll(Stream.of(t3, t4, t5).collect(Collectors.toList()));
         Transaction t7 = new Transaction(ah2.getId(), ac2, ac1, new Money(new BigDecimal("100")), TransactionType.TRANSFERENCE);
-        t7.setDate(new Date(t1.getDate().getTime()+250000l));
+        t7.setDate(new Date(t1.getDate().getTime() + 250000l));
         assertTrue(!transactionService.checkTransaction(t7));
     }
 

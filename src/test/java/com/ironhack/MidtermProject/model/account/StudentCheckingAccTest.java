@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StudentCheckingAccTest {
 
@@ -27,22 +28,23 @@ class StudentCheckingAccTest {
         ah1 = new AccountHolder("Juan", "juanito", "juanito", d1, add1, null);
         ah2 = new AccountHolder("Pedro", "pedrito", "pedrito", d2, add1, null);
         ac3 = new StudentCheckingAcc();
-        ac1 = new StudentCheckingAcc(ah1,ah2,new Money(new BigDecimal("10000")), Status.ACTIVE);
-        ac2 = new StudentCheckingAcc(ah1,ah2,new Money(new BigDecimal("10000")), "ES2394827394", Status.FROZEN);
+        ac1 = new StudentCheckingAcc(ah1, ah2, new Money(new BigDecimal("10000")), Status.ACTIVE);
+        ac2 = new StudentCheckingAcc(ah1, ah2, new Money(new BigDecimal("10000")), "ES2394827394", Status.FROZEN);
     }
 
     @Test
-    void generateKey_WellDone(){
+    void generateKey_WellDone() {
         assertTrue(ac1.getSecretKey().contains("ES"));
     }
 
     @Test
-    void setStatus_NullStatus_Active(){
+    void setStatus_NullStatus_Active() {
         ac2.setStatus(null);
         assertEquals(Status.ACTIVE, ac2.getStatus());
     }
+
     @Test
-    void setSecretKey(){
+    void setSecretKey() {
         ac2.setSecretKey("AM1237429");
         assertEquals("AM1237429", ac2.getSecretKey());
     }

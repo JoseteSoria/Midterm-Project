@@ -1,7 +1,6 @@
 package com.ironhack.MidtermProject.model.classes;
 
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class Address {
@@ -10,7 +9,8 @@ public class Address {
     private String city;
     private String street;
 
-    public Address() {}
+    public Address() {
+    }
 
     public Address(String country, String city, String street) {
         setCountry(country);

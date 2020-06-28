@@ -1,6 +1,5 @@
 # Midterm Project
-
-## Banking System  
+### Banking System  
 ---
 
 This project seeks to provide a solution to manage some types of account which could be in a "any" banking system. 
@@ -24,6 +23,11 @@ insert into admin values (1);
 
 
 Do not forget to properly configure the application.properties!
+
+*If you use the initialization of the database from the _data.sql_ you would have to add to your application.properties:*
+```
+spring.datasource.initialization-mode=always
+```
 
 The only things to add up are: 
 * For the fraud section the admin operations have not been taking into account.

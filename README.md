@@ -34,6 +34,11 @@ The only things to add up are:
 * The admin can change the Status of the account when manually.
 * Due to the credit card do not have Status or secretKey _Third Party_ users can not interact with them and that kind of account can not be frozen (the fraud conditions are anyways considered but they will not freeze the account).
 
+(Take into account that the credit card accounts work in a different way)
+
+Here you have the ORM map.
+![ORM](ORM.PNG)
+
 You will find below the official project requirements. 
 
 ---
